@@ -11,16 +11,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+  //link
   //https://drive.google.com/file/d/1KVdpQuQcPvlH3CqZ-3IFQC0XemfNpMlU/view?usp=sharing
 
 
-  model User {
-    id        int       @in @default(autoincrement())
-    name      string    
-
-
+  model Companies {
+    id        Int       @in @default(autoincrement())
+    name      String    
+    category  String
+    cnpj      String
+    places    String
+    zip_code  String
+    addrres   String
+    phone     String
+    products  Products  @relation(filds: [productId], references:[id])
+    uses      User      @relation(filds: [userId], references:[id])
     createAt  DateTime  @default(now())
+    updateAt  DateTime  @updateAt
+    
+    @@map("companies")
 
   }
 
