@@ -35,10 +35,23 @@ datasource db {
 
 model Payment{
 
-id Int  @id @default(autoincrement())
-companyId Int @id
-userId Int @id
+  id              Int     @id   @default(autoincrement())
+  companyId       Int     @id
+  userId          Int     @id
+  value           Float
+  toDate          DateTime
+  DueDate         DateTime
+  paymentMethod   String
+  userId          Int     @map("user_id")
+  user            User    @relation(fields: [userId], references: [id])
 
+}
 
-
+model Product_payments{
+  id            Int         @id   @default(autoincrement())
+  paymentId     Int         @id  
+  productId     Int         @id
+  paymentMethod String
+  paymentId     Int         @map("payment_id")
+  payment       Payment     @relation(fields: [paymentId], references: [ids]) 
 }
