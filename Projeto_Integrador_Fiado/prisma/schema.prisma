@@ -24,6 +24,8 @@ datasource db {
     zip_code  String
     addrres   String
     phone     String
+    productId           @map("produc_id")
+    userId              @map("user_id")
     products  Products  @relation(filds: [productId], references:[id])
     uses      User      @relation(filds: [userId], references:[id])
     createAt  DateTime  @default(now())
@@ -32,9 +34,3 @@ datasource db {
     @@map("companies")
 
   }
-
-
-
-
-
-
