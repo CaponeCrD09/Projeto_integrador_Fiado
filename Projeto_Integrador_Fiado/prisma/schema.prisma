@@ -10,3 +10,12 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+
+  //https://drive.google.com/file/d/1KVdpQuQcPvlH3CqZ-3IFQC0XemfNpMlU/view?usp=sharing
+
+  
+
+
+
+
