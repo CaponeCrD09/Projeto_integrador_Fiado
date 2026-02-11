@@ -10,3 +10,35 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model Payment{
+
+id Int  @id @default(autoincrement())
+companyId Int @id
+userId Int @id
+
+
+
+}
