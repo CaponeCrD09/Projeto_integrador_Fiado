@@ -37,10 +37,9 @@ model Payment{
 
   id              Int     @id   @default(autoincrement())
   companyId       Int     @id
-  userId          Int     @id
   value           Float
-  toDate          DateTime
-  DueDate         DateTime
+  toDate          DateTime @map(to_date)
+  dueDate         DateTime @map(due_date) 
   paymentMethod   String
   userId          Int     @map("user_id")
   user            User    @relation(fields: [userId], references: [id])
