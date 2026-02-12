@@ -11,26 +11,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-  //link
-  //https://drive.google.com/file/d/1KVdpQuQcPvlH3CqZ-3IFQC0XemfNpMlU/view?usp=sharing
+model Companies {
+  id        Int       @in @default(autoincrement())
+  name      String    
+  category  String
+  cnpj      String
+  places    String
+  zip_code  String
+  addrres   String
+  phone     String
+  productId           @map("produc_id")
+  userId              @map("user_id")
+  products  Products  @relation(filds: [productId], references:[id])
+  uses      User      @relation(filds: [userId], references:[id])
+  createAt  DateTime  @default(now())
+  updateAt  DateTime  @updateAt
+  
+  @@map("companies")
 
+}
 
-  model Companies {
-    id        Int       @in @default(autoincrement())
-    name      String    
-    category  String
-    cnpj      String
-    places    String
-    zip_code  String
-    addrres   String
-    phone     String
-    productId           @map("produc_id")
-    userId              @map("user_id")
-    products  Products  @relation(filds: [productId], references:[id])
-    uses      User      @relation(filds: [userId], references:[id])
-    createAt  DateTime  @default(now())
-    updateAt  DateTime  @updateAt
-    
-    @@map("companies")
+model Payment{
 
-  }
+  id              Int     @id   @default(autoincrement())
+  companyId       Int     @id
+  value           Float
+  paymentMethod   String
+  userId          Int      @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
+  toDate          DateTime @map(to_date)
+  dueDate         DateTime @map(due_date) 
+  @@maps("users")
+}
+
+model Product_payments{
+  id            Int         @id   @default(autoincrement())
+  paymentId     Int         @id  
+  productId     Int         @id
+  paymentMethod String
+  paymentId     Int         @map("payment_id")
+  payment       Payment     @relation(fields: [paymentId], references: [ids])
+  @@map("payment") 
+}
