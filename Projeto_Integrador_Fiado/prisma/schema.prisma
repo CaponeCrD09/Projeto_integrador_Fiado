@@ -50,7 +50,7 @@ model products {
 }
 
 
-
+model Payment {
 
   id              Int     @id   @default(autoincrement())
   companyId       Int     @id
