@@ -31,10 +31,6 @@ model Companies {
 
 }
 
-model Payment{
-
-  }
-
 model products {
 
   id                  Int        @in @default(autoincrement())
