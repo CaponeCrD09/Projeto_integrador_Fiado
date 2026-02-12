@@ -35,16 +35,16 @@ datasource db {
 
   }
 
-  model products {
+model products {
 
-    id                  Int        @in @default(autoincrement())
-    name                String
-    type                String 
-    value               Float
-    description         String 
-    url_img             String
-    companies           Company[]
-    products_payment    productspayment[]
+  id                  Int        @in @default(autoincrement())
+  name                String
+  type                String 
+  value               Float
+  description         String 
+  url_img             String
+  companies           Company[]
+  products_payment    productspayment[]
 
 
 }
