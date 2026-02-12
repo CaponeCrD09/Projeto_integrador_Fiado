@@ -47,7 +47,7 @@ model products {
   products_payment    productspayment[]
 
 
-}
+{}
 
 
 
