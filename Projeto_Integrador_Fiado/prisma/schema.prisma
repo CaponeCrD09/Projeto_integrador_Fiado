@@ -38,12 +38,12 @@ model Payment{
   id              Int     @id   @default(autoincrement())
   companyId       Int     @id
   value           Float
+  paymentMethod   String
+  userId          Int      @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
   toDate          DateTime @map(to_date)
   dueDate         DateTime @map(due_date) 
-  paymentMethod   String
-  userId          Int     @map("user_id")
-  user            User    @relation(fields: [userId], references: [id])
-
+  @@maps("users")
 }
 
 model Product_payments{
@@ -52,5 +52,6 @@ model Product_payments{
   productId     Int         @id
   paymentMethod String
   paymentId     Int         @map("payment_id")
-  payment       Payment     @relation(fields: [paymentId], references: [ids]) 
+  payment       Payment     @relation(fields: [paymentId], references: [ids])
+  @@map("payment") 
 }
