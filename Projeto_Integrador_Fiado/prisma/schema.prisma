@@ -11,27 +11,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Companies {
-  id        Int       @in @default(autoincrement())
+model Companie {
+  id        Int       @i @default(autoincrement())
   name      String    
   category  String
   cnpj      String
   places    String
   zip_code  String
   addrres   String
-  phone     String
-  productId           @map("produc_id")
-  userId              @map("user_id")
-  products  Products  @relation(filds: [productId], references:[id])
-  uses      User      @relation(filds: [userId], references:[id])
-  createAt  DateTime  @default(now())
-  updateAt  DateTime  @updateAt
+  phone     String     
+  productId          Int @map("product_id")
+  userId             Int @map("user_id")
+  products  Products    @relation(fields: [productId], references:[id])
+  uses      User        @relation(fields: [userId], references:[id])
+  createAt  DateTime    @default(now())
+  updateAt  DateTime    @updateAt
   
-  @@map("companies")
+  @@map("companie")
 
 }
 
-model products {
+model Products {
 
   id                  Int        @in @default(autoincrement())
   name                String
@@ -49,7 +49,7 @@ model products {
 model Payment {
 
   id              Int     @id   @default(autoincrement())
-  companyId       Int     @id
+  companyId       Int     
   value           Float
   paymentMethod   String
   userId          Int      @map("user_id")
@@ -62,7 +62,7 @@ model Payment {
 
 model User{
 
-  id          int         @id   @default(autoincrement())
+  id          Int         @id   @default(autoincrement())
   name        String
   type        String
   email       String
@@ -75,9 +75,8 @@ model User{
 }
 
 
-model Product_payments{
-  id            Int         @id   @default(autoincrement())
-  paymentId     Int         @id  
+model ProductPayments{
+  id            Int         @id   @default(autoincrement()) 
   productId     Int         @id
   paymentMethod String
   paymentId     Int         @map("payment_id")
