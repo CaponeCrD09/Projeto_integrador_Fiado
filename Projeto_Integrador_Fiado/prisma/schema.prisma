@@ -46,8 +46,6 @@ model products {
 
 }
 
-model Payment{
-
 model Payment {
 
   id              Int     @id   @default(autoincrement())
