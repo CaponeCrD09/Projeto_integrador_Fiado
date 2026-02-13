@@ -20,8 +20,8 @@ Model Companie {
   zip_code  String
   addrres   String
   phone     String     
-  productId          Int @map("product_id")
-  userId             Int @map("user_id")
+  productId          Int @map("productId")
+  userId             Int @map("userId")
   products  Products    @relation(fields: [productId], references:[id])
   uses      User        @relation(fields: [userId], references:[id])
   createAt  DateTime    @default(now())
@@ -54,7 +54,7 @@ Model Payment {
   companyId       Int     
   value           Float
   paymentMethod   String
-  userId          Int      @map("user_id")
+  userId          Int      @map("userId")
   user            User     @relation(fields: [userId], references: [id])
   toDate          DateTime @map(to_date)
   dueDate         DateTime @map(due_date) 
@@ -69,10 +69,7 @@ Model User{
   type        String
   email       String
   senha       String
-
-
   userCompany  Companies[] @relation("Companies")
-
   @@map("users") 
 }
 
@@ -81,8 +78,8 @@ Model ProductPayments{
   id            Int         @id   @default(autoincrement()) 
   productId     Int         
   paymentMethod String
-  paymentId     Int         @map("payment_id")
+  paymentId     Int         @map("paymentId")
   payment       Payment     @relation(fields: [paymentId], references: [id])
-  @@map("productpayments") 
+  @@map("productPayments") 
 }
 
