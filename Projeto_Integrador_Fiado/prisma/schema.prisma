@@ -32,6 +32,7 @@ model Companies {
 }
 
 
+
 model products {
 
   id                  Int        @in @default(autoincrement())
@@ -47,7 +48,7 @@ model products {
 
 model Payment{
 
-
+model Payment {
 
   id              Int     @id   @default(autoincrement())
   companyId       Int     @id
@@ -57,8 +58,24 @@ model Payment{
   user            User     @relation(fields: [userId], references: [id])
   toDate          DateTime @map(to_date)
   dueDate         DateTime @map(due_date) 
-  @@maps("users")
+  @@maps("payments")
 }
+
+
+model User{
+
+  id          int         @id   @default(autoincrement())
+  name        String
+  type        String
+  email       String
+  senha       String
+
+
+  userCompany  Companies[] @relation("Companies")
+
+  @@maps("users") 
+}
+
 
 model Product_payments{
   id            Int         @id   @default(autoincrement())
@@ -66,6 +83,7 @@ model Product_payments{
   productId     Int         @id
   paymentMethod String
   paymentId     Int         @map("payment_id")
-  payment       Payment     @relation(fields: [paymentId], references: [ids])
-  @@map("payment") 
+  payment       Payment     @relation(fields: [paymentId], references: [id])
+  @@map("product_payments") 
 }
+
