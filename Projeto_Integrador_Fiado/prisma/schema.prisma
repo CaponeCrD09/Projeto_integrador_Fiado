@@ -22,8 +22,8 @@ model Company {
   addrres   String
   phone     String     
 
-  productId          Int @map("product_id")
-  products  Products    @relation(fields: [productId], references:[id])
+  productId          Int @map("product_Id")
+  products  Product    @relation(fields: [productId], references:[id])
 
   userId             Int @map("user_id")
   users      User        @relation(fields: [userId], references:[id])
@@ -48,9 +48,11 @@ model Product {
   description         String 
   url_img             String
   
-  companies           Company         @relation(fields: [companiesId], references:[id])
+  companies           Company        @relation(fields: [companyId], references:[id])
+  companyId           Int               @map("company_id")
   
-  products_payment    productspayment  @relation(fields: [productPaymentId], references:[id])
+  product_payments    ProductPayment @relation(fields: [productPaymentId], references:[id])
+  productPaymentId   Int               @map("product_paymet_id")
 
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updateAt
@@ -64,7 +66,7 @@ model Payment {
   companyId       Int     
   value           Float
   
-  paymentMethod   String   @relation(fields: [paymentMethodId], references: [id])
+  paymentMethod   String   
 
   toDate          DateTime @map(to_date)
   dueDate         DateTime @map(due_date) 
@@ -96,9 +98,9 @@ model User{
 }
 
 
-model ProductPayments{
+model ProductPayment{
   id            Int         @id   @default(autoincrement()) 
-  paymentMethod String            @relation(fields: [paymentMethodId], references: [id])
+  paymentMethod String            
 
   paymentId     Int               @map("payment_id")
   payment       Payment           @relation(fields: [paymentId], references: [id])
