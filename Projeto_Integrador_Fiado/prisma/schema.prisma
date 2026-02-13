@@ -83,6 +83,6 @@ Model ProductPayments{
   paymentMethod String
   paymentId     Int         @map("payment_id")
   payment       Payment     @relation(fields: [paymentId], references: [id])
-  @@map("product_payments") 
+  @@map("productpayments") 
 }
 
