@@ -11,7 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-Model Company {
+model Company {
   id        Int       @id @default(autoincrement())
 
   name      String    
@@ -22,10 +22,10 @@ Model Company {
   addrres   String
   phone     String     
 
-  productId          Int @map("productId")
+  productId          Int @map("product_id")
   products  Products    @relation(fields: [productId], references:[id])
 
-  userId             Int @map("userId")
+  userId             Int @map("user_id")
   users      User        @relation(fields: [userId], references:[id])
   
   createAt  DateTime    @default(now())
@@ -39,33 +39,37 @@ Model Company {
 
 
 
-Model Product {
+model Product {
 
-  id                  Int        @id @default(autoincrement())
+  id                  Int               @id @default(autoincrement())
   name                String
   type                String 
   value               Float
   description         String 
   url_img             String
-  companies           Company[]
-  products_payment    productspayment[]
+  
+  companies           Company         @relation(fields: [companiesId], references:[id])
+  
+  products_payment    productspayment  @relation(fields: [productPaymentId], references:[id])
 
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updateAt
-  
+
   @@map("products")
 }
 
-Model Payment {
+model Payment {
 
   id              Int     @id   @default(autoincrement())
   companyId       Int     
   value           Float
-  paymentMethod   String
+  
+  paymentMethod   String   @relation(fields: [paymentMethodId], references: [id])
+
   toDate          DateTime @map(to_date)
   dueDate         DateTime @map(due_date) 
   
-  userId          Int      @map("userId")
+  userId          Int      @map("user_id")
   user            User     @relation(fields: [userId], references: [id])
   
   createAt  DateTime    @default(now())
@@ -75,7 +79,7 @@ Model Payment {
 }
 
 
-Model User{
+model User{
 
   id          Int         @id   @default(autoincrement())
   name        String
@@ -83,7 +87,7 @@ Model User{
   email       String
   senha       String
 
-  companies  Company[] @relation("user_company")
+  companies  Company   @relation("user_company")
   
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updateAt
@@ -92,17 +96,17 @@ Model User{
 }
 
 
-Model ProductPayments{
+model ProductPayments{
   id            Int         @id   @default(autoincrement()) 
-  paymentMethod String
+  paymentMethod String            @relation(fields: [paymentMethodId], references: [id])
 
-  paymentId     Int         @map("payment_id")
-  payment       Payment     @relation(fields: [paymentId], references: [id])
+  paymentId     Int               @map("payment_id")
+  payment       Payment           @relation(fields: [paymentId], references: [id])
 
   productId     Int         
 
-  createAt  DateTime    @default(now())
-  updateAt  DateTime    @updateAt
+  createAt  DateTime              @default(now())
+  updateAt  DateTime              @updateAt
 
   @@map("product_payments") 
 }
