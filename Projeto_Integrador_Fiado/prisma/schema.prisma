@@ -11,26 +11,105 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-  //link
-  //https://drive.google.com/file/d/1KVdpQuQcPvlH3CqZ-3IFQC0XemfNpMlU/view?usp=sharing
+model Company {
+  id        Int       @id @default(autoincrement())
+
+  name      String    
+  category  String
+  cnpj      String
+  places    String
+  zip_code  String
+  addrres   String
+  phone     String     
+
+  productId          Int @map("product_Id")
+  products  Product    @relation(fields: [productId], references:[id])
+
+  userId             Int @map("user_id")
+  users      User        @relation(fields: [userId], references:[id])
+  
+  createAt  DateTime    @default(now())
+  updateAt  DateTime    @updateAt
+  
+  @@map("companies")
+
+}
 
 
-  model Companies {
-    id        Int       @in @default(autoincrement())
-    name      String    
-    category  String
-    cnpj      String
-    places    String
-    zip_code  String
-    addrres   String
-    phone     String
-    productId           @map("produc_id")
-    userId              @map("user_id")
-    products  Products  @relation(filds: [productId], references:[id])
-    uses      User      @relation(filds: [userId], references:[id])
-    createAt  DateTime  @default(now())
-    updateAt  DateTime  @updateAt
-    
-    @@map("companies")
 
-  }
+
+
+model Product {
+
+  id                  Int               @id @default(autoincrement())
+  name                String
+  type                String 
+  value               Float
+  description         String 
+  url_img             String
+  
+  companies           Company        @relation(fields: [companyId], references:[id])
+  companyId           Int               @map("company_id")
+  
+  product_payments    ProductPayment @relation(fields: [productPaymentId], references:[id])
+  productPaymentId   Int               @map("product_paymet_id")
+
+  createAt  DateTime    @default(now())
+  updateAt  DateTime    @updateAt
+
+  @@map("products")
+}
+
+model Payment {
+
+  id              Int     @id   @default(autoincrement())
+  companyId       Int     
+  value           Float
+  
+  paymentMethod   String   
+
+  toDate          DateTime @map(to_date)
+  dueDate         DateTime @map(due_date) 
+  
+  userId          Int      @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
+  
+  createAt  DateTime    @default(now())
+  updateAt  DateTime    @updateAt
+  
+  @@map("payments")
+}
+
+
+model User{
+
+  id          Int         @id   @default(autoincrement())
+  name        String
+  type        String
+  email       String
+  senha       String
+
+  companies  Company   @relation("user_company")
+  
+  createAt  DateTime    @default(now())
+  updateAt  DateTime    @updateAt
+  
+  @@map("users") 
+}
+
+
+model ProductPayment{
+  id            Int         @id   @default(autoincrement()) 
+  paymentMethod String            
+
+  paymentId     Int               @map("payment_id")
+  payment       Payment           @relation(fields: [paymentId], references: [id])
+
+  productId     Int         
+
+  createAt  DateTime              @default(now())
+  updateAt  DateTime              @updateAt
+
+  @@map("product_payments") 
+}
+
