@@ -10,6 +10,7 @@ app.use(express.json()); // aqui quam fomato json
 
 app.use('/user',userRouter);
 app.use('/product',productRouter);
+app.use('/payments',paymentRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen( PORT, () => console.log(`HTTP => http://localhost:${PORT}`));
