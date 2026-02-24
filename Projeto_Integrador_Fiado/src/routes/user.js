@@ -7,3 +7,4 @@ const router = Router();
 
 router.post('/', createUser);
 export default router;
+
