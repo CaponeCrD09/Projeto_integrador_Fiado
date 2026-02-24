@@ -5,3 +5,5 @@ import {CreateProducts} from '../services/products';
 const router = Router();
 
 router.post('/', CreateProducts);
+
+export default router;
