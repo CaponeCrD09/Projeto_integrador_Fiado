@@ -22,17 +22,16 @@ model Company {
   addrres   String
   phone     String     
 
-  productId          Int @map("product_Id")
-  products  Product    @relation(fields: [productId], references:[id])
+  productId Int         @map("product_Id")
+  products  Product[]    
 
-  userId             Int @map("user_id")
-  users      User        @relation(fields: [userId], references:[id])
+  userId     Int        @map("user_id")
+  users      User       @relation(fields: [userId], references:[id])
   
   createAt  DateTime    @default(now())
-  updateAt  DateTime    @updateAt
+  updateAt  DateTime    @updatedAt
   
   @@map("companies")
-
 }
 
 
@@ -48,34 +47,40 @@ model Product {
   description         String 
   url_img             String
   
-  companies           Company        @relation(fields: [companyId], references:[id])
+  companies           Company           @relation(fields: [companyId], references:[id])
   companyId           Int               @map("company_id")
   
-  product_payments    ProductPayment @relation(fields: [productPaymentId], references:[id])
-  productPaymentId   Int               @map("product_paymet_id")
+
+  productPaymentId    Int             @map("product_paymet_id")
+  product_payments    ProductPayment[]
+
 
   createAt  DateTime    @default(now())
-  updateAt  DateTime    @updateAt
+  updateAt  DateTime    @updatedAt
 
   @@map("products")
 }
 
 model Payment {
 
-  id              Int     @id   @default(autoincrement())
+  id              Int                   @id   @default(autoincrement())
   companyId       Int     
   value           Float
   
   paymentMethod   String   
 
-  toDate          DateTime @map(to_date)
-  dueDate         DateTime @map(due_date) 
+  toDate            DateTime                    @map("to_date")
+  dueDate           DateTime                    @map("due_date") 
   
-  userId          Int      @map("user_id")
-  user            User     @relation(fields: [userId], references: [id])
+  userId            Int                         @map("user_id")
+  user              User                        @relation(fields: [userId], references: [id])
   
-  createAt  DateTime    @default(now())
-  updateAt  DateTime    @updateAt
+  productPaymentId  Int                @unique  @map("product_paymet_id")
+  productpayments  ProductPayment               []
+
+
+  createAt          DateTime                    @default(now())
+  updateAt          DateTime                    @updatedAt
   
   @@map("payments")
 }
@@ -89,11 +94,12 @@ model User{
   email       String
   senha       String
 
-  companies  Company   @relation("user_company")
+  companies  Company[]
   
   createAt  DateTime    @default(now())
-  updateAt  DateTime    @updateAt
-  
+  updateAt  DateTime    @updatedAt
+  payments  Payment[]
+
   @@map("users") 
 }
 
@@ -105,10 +111,11 @@ model ProductPayment{
   paymentId     Int               @map("payment_id")
   payment       Payment           @relation(fields: [paymentId], references: [id])
 
-  productId     Int         
+  productId     Int               @map("product_id")
+  product       Product           @relation(fields: [productId], references: [id])
 
   createAt  DateTime              @default(now())
-  updateAt  DateTime              @updateAt
+  updateAt  DateTime              @updatedAt
 
   @@map("product_payments") 
 }
