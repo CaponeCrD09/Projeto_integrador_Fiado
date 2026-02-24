@@ -3,4 +3,5 @@ import { z } from "zod";
 import { createPayment } from "services/company";
 const router = Router();
 
-router.post('/create', createPayment);
+router.post('/', createPayment);
+export default router;

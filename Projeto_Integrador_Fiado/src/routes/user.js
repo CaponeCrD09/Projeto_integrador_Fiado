@@ -6,3 +6,5 @@ const router = Router();
 // const zod = z();
 
 router.post('/', createUser);
+
+export default router;
