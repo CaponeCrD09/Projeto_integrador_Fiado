@@ -4,4 +4,4 @@ import {CreateProducts} from '../services/products';
 
 const router = Router();
 
-router.post('/');
+router.post('/', CreateProducts);
