@@ -1,10 +1,10 @@
 import 'dotenv/config'; //chaves
 import express from 'express'; //framwork
 import cors from 'cors'; //ele vai permitir a cominuicação com o forntend
-import userRouter from './routes/user';
-import productRouter from './routes/products';
-import companiesRouter from './routes/companies';
-import paymentRouter from './routes/payments';
+import userRouter from './routes/user.js';
+import productRouter from './routes/products.js';
+import companiesRouter from './routes/companies.js';
+import paymentRouter from './routes/payments.js';
 
 
 const app = express(); // estou ciando um app
