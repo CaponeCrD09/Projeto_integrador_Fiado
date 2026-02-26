@@ -1,0 +1,19 @@
+POST http://localhost:3000/payment HTTP/1.1
+content-type: application/json
+
+{
+
+    "companyId":
+    "value"           
+  
+    "paymentMethod"   
+
+    "toDate"           
+    "dueDate"          
+
+    "userId"          
+ 
+  
+    "productPaymentId"                 
+
+}
