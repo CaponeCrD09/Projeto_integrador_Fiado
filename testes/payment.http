@@ -2,7 +2,7 @@ POST http://localhost:3000/payment HTTP/1.1
 content-type: application/json
 
 {
-    "companyId":1,
+    "companyId":2,
     "value":20.0,      
     "paymentMethod":"pix",  
     "toDate":"1970-01-01T00:00:00.000Z",       
