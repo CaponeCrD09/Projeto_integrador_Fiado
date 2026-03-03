@@ -1,0 +1,2 @@
+### criando os produtos
+ POST http://localhost:3000/products
