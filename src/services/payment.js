@@ -13,3 +13,8 @@ export async function createPayment(req, res, _next){
     return res.status(201).json(u);
 
 }
+
+export async function readPayment(req, res, _next) {
+    let users = await prisma.payment.findMany();
+    return res.status(200).json(payment);
+}
