@@ -17,6 +17,7 @@ export async function  readUser(req, res, _next) {
     let users = await prisma.user.findMany();
     return res.status(200).json(users);
 }
+
 export async function readPayment(req, res, _next) {
     let users = await prisma.payment.findMany();
     return res.status(200).json(payment);
