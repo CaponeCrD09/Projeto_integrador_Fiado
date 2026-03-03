@@ -11,4 +11,10 @@ content-type: application/json
   "url_img":      "https://example.com/nere-pao.jpg"
 }
 
+### Listar todos as companias.
+
+GET http://localhost:3000/payment HTTP/1.1
+content-type: application/json
+
+
 
