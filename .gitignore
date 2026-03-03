@@ -1,0 +1,6 @@
+# keep environment variables out
+.env
+/generated/prisma
+node_modules
+/prisma/dev.db
+package-lock.json
