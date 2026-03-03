@@ -10,7 +10,7 @@ router.get('/',readUser)
 
 
 
-router.get("/", readPayment)
+
 
 export default router;
 

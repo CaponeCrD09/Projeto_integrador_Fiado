@@ -4,4 +4,5 @@ import { createPayment, readPayment } from "../services/payment.js";
 const router = Router();
 
 router.post('/', createPayment);
+router.get("/", readPayment);
 export default router; 
