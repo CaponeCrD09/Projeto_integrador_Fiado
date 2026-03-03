@@ -12,3 +12,8 @@ export async function createUser(req , res, _next){
     let u = await prisma.user.create({data});
     return res.status(201).json(u);
 }
+
+export async function  readUser(req, res, _next) {
+    let users = await prisma.user.findMany();
+    return res.status(200).json(users);
+}

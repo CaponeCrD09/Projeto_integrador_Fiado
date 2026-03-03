@@ -1,10 +1,12 @@
 import {Router} from 'express';
 import { z } from 'zod';
-import { createUser } from '../services/user.js';
+import { createUser,readUser} from '../services/user.js';
 
 const router = Router();
 // const zod = z();
 
 router.post('/', createUser);
+router.get('/',readUser)
+
 export default router;
 
