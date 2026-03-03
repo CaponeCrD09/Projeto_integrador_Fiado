@@ -13,13 +13,8 @@ export async function createUser(req , res, _next){
     return res.status(201).json(u);
 }
 
-<<<<<<< HEAD
 export async function  readUser(req, res, _next) {
     let users = await prisma.user.findMany();
     return res.status(200).json(users);
-=======
-export async function readPayment(req, res, _next) {
-    let users = await prisma.payment.findMany();
-    return res.status(200).json(payment);
->>>>>>> 7da6d7728f6d978276bc56cfaea8e7e803c8b9dc
 }
+

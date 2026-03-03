@@ -1,7 +1,8 @@
 import { Router} from "express";
 import { z } from "zod";
-import { createPayment } from "../services/payment.js";
+import { createPayment, readPayment } from "../services/payment.js";
 const router = Router();
 
 router.post('/', createPayment);
+router.get("/", readPayment);
 export default router; 
