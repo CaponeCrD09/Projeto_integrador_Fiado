@@ -1,7 +1,6 @@
-### criando os pro
 
-
-POST http://localhost:3000/product HTTP/1.1
+### criando os companias
+POST http://localhost:3000/company HTTP/1.1
 content-type: application/json
 
 {
@@ -11,10 +10,13 @@ content-type: application/json
   "url_img":      "https://example.com/nere-pao.jpg"
 }
 
-### Listar todos as companias.
 
-GET http://localhost:3000/payment HTTP/1.1
+### Listar todos as companias.
+GET http://localhost:3000/company HTTP/1.1
 content-type: application/json
 
 
+### busca apens um ususario
+GET http://localhost:3000/company/id HTTP/1.1
+content-type: application/json
 
