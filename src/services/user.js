@@ -21,7 +21,7 @@ export async function  readUser(req, res, _next) {
 
 export async function showUser(req, res, _next) {
     let id = Number(req.params.id);
-    let u = prisma.user.findFirst({where: {id:id}});
+    let u = await prisma.user.findFirst({where: {id:id}});
     return res.status(200).json(u);
 }
 
