@@ -13,7 +13,6 @@ datasource db {
 
 model Company {
   id        Int       @id @default(autoincrement())
-
   name      String    
   category  String
   cnpj      String
