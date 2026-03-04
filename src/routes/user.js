@@ -10,7 +10,5 @@ router.get('/',readUser)
 router.get('/:id',showUser);
 
 
-
-
 export default router;
 
