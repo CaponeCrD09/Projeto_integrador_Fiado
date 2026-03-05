@@ -4,9 +4,9 @@ POST http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "felipesouza",
+  "name": "milena",
   "type": "pizzariateste",
-  "email":"felipesouza@gmail.com",
+  "email":"milena@gmail.com",
   "senha":"12345"
 }
 

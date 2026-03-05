@@ -13,6 +13,7 @@ datasource db {
 
 model Company {
   id        Int       @id @default(autoincrement())
+
   name      String    
   category  String
   cnpj      String
@@ -21,12 +22,12 @@ model Company {
   addrres   String
   phone     String     
 
-  productId Int         @map("product_Id")
-  products  Product[]    
-
   userId     Int        @map("user_id")
-  users      User       @relation(fields: [userId], references:[id])
+  user       User       @relation(fields: [userId], references:[id])
   
+  products  Product[]    
+  payments  Payment[]
+
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updatedAt
   
@@ -38,21 +39,18 @@ model Company {
 
 
 model Product {
-
   id                  Int               @id @default(autoincrement())
+
   name                String
   type                String 
   value               Float
   description         String 
   url_img             String
   
-  companies           Company           @relation(fields: [companyId], references:[id])
   companyId           Int               @map("company_id")
+  companies           Company           @relation(fields: [companyId], references:[id])
   
-
-  productPaymentId    Int             @map("product_paymet_id")
-  product_payments    ProductPayment[]
-
+  payments          Payment[]           @relation("product_payment")
 
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updatedAt
@@ -61,22 +59,20 @@ model Product {
 }
 
 model Payment {
-
   id              Int                   @id   @default(autoincrement())
-  companyId       Int     
-  value           Float
   
-  paymentMethod   String   
-
+  value           Float
+  method   String   
   toDate            DateTime                    @map("to_date")
   dueDate           DateTime                    @map("due_date") 
   
   userId            Int                         @map("user_id")
   user              User                        @relation(fields: [userId], references: [id])
   
-  productPaymentId  Int                @unique  @map("product_paymet_id")
-  productpayments  ProductPayment               []
+  companyId       Int                           @map("company_id")
+  company         Company                       @relation(fields: [companyId], references:[id])
 
+  products          Product[]                   @relation("product_payment")
 
   createAt          DateTime                    @default(now())
   updateAt          DateTime                    @updatedAt
@@ -86,36 +82,18 @@ model Payment {
 
 
 model User{
-
   id          Int         @id   @default(autoincrement())
+
   name        String
   type        String
   email       String
   senha       String
 
   companies  Company[]
+  payments  Payment[]
   
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updatedAt
-  payments  Payment[]
 
   @@map("users") 
 }
-
-
-model ProductPayment{
-  id            Int         @id   @default(autoincrement()) 
-  paymentMethod String            
-
-  paymentId     Int               @map("payment_id")
-  payment       Payment           @relation(fields: [paymentId], references: [id])
-
-  productId     Int               @map("product_id")
-  product       Product           @relation(fields: [productId], references: [id])
-
-  createAt  DateTime              @default(now())
-  updateAt  DateTime              @updatedAt
-
-  @@map("product_payments") 
-}
-

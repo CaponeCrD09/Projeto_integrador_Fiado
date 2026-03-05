@@ -1,9 +1,13 @@
-import { Router} from "express";
-import {z} from 'zod';
-import {CreateProducts} from '../services/product.js';
+import {Router} from 'express';
+import { z } from 'zod';
+import { createProducts,readProducts,showProducts} from '../services/product.js';
 
 const router = Router();
+// const zod = z();
 
-router.post('/', CreateProducts);
+router.post('/', createProducts);
+router.get('/',readProducts)
+router.get('/:id',showProducts);
+
 
 export default router;
