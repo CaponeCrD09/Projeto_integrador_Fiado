@@ -5,9 +5,13 @@ content-type: application/json
 
 {
   "name":         "Neres Pao",
-  "type":         "Pão",
-  "description":  "Pão de forma fresco e saboroso",
-  "url_img":      "https://example.com/nere-pao.jpg"
+  "category":     "Alimentação",
+  "cnpj":         "12345678000199",
+  "places":       "Localização da empresa",
+  "zip_code":     "12345-678",
+  "addrres":      "Rua Exemplo, 123",
+  "phone":          "(11) 1234-5678",
+  "userId":         1
 }
 
 
