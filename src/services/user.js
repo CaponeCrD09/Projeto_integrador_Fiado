@@ -14,7 +14,13 @@ export async function createUser(req , res, _next){
 }
 
 export async function  readUser(req, res, _next) {
-    let users = await prisma.user.findMany();
+    const {name,type,email} = req.query;
+    let consult = {}
+
+    if(name) consult.name = {contains: "%" + name + "%"}
+    if(type) consult.type = {contains: "%" + type+ "%"}
+    if(email) consult.email = {contains: "%" + email + "%"}
+    let users = await prisma.user.findMany({where: consult});
     return res.status(200).json(users);
 }
 
@@ -24,5 +30,4 @@ export async function showUser(req, res, _next) {
     let u = await prisma.user.findFirst({where: {id:id}});
     return res.status(200).json(u);
 }
-
 

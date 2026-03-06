@@ -4,8 +4,8 @@ POST http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "felipesouza",
-  "type": "pizzariateste",
+  "name": "teste",
+  "type": "bolos",
   "email":"felipesouza@gmail.com",
   "senha":"12345"
 }
@@ -17,5 +17,15 @@ content-type: application/json
 
 ### busca apens um ususario
 
-GET http://localhost:3000/user/1 HTTP/1.1
+GET http://localhost:3000/user/2 HTTP/1.1
+content-type: application/json
+
+### buscar por nome
+
+GET http://localhost:3000/user?name=teste HTTP/1.1
+content-type: application/json
+
+### buscar por type
+
+GET http://localhost:3000/user?type=bo HTTP/1.1
 content-type: application/json
