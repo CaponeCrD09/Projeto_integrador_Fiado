@@ -3,9 +3,9 @@ import { number, z } from 'zod';
 const prisma = new PrismaClient();
 
 
-//req: requisição oque esta vindo do frontend
-//res; response oque eu vou respoder
-//next; proximo oque eu vou fazer a seguir
+//req: request, ou seja, a requisição que o frontend está fazendo para o backend, onde eu posso pegar os dados que estão sendo enviados pelo frontend, como por exemplo, os dados de um formulário ou os parâmetros de uma URL
+//res; response, ou seja, a resposta que o backend vai enviar para o frontend, onde eu posso enviar os dados que eu quero que o frontend receba, como por exemplo, os dados de um produto ou uma mensagem de erro
+//next; função para passar para o próximo middleware, caso haja algum erro ou algo do tipo, ele passa para o próximo middleware de tratamento de erros
 export async function createProducts(req , res, _next){
 
     const data = req.body
@@ -14,8 +14,14 @@ export async function createProducts(req , res, _next){
 }
 
 export async function  readProducts(req, res, _next) {
-    let products = await prisma.product.findMany();
-    return res.status(200).json(products);
+    const {name,type,value} = req.query;
+    let consult = {}
+
+    if(name) consult.name = {contains: "%" + name + "%"}
+    if(type) consult.type = {contains: "%" + type+ "%"}
+    if(value) consult.value = {contains: "%" + value + "%"}
+    let p = await prisma.product.findMany({where: consult});
+    return res.status(200).json(p);
 }
 
 
