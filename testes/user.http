@@ -29,3 +29,15 @@ content-type: application/json
 
 GET http://localhost:3000/user?type=bo HTTP/1.1
 content-type: application/json
+
+### edita user 
+
+PUT http://localhost:3000/user/1 HTTP/1.1
+content-type: application/json
+
+{
+  "name": "camila cristina",
+  "type": "pizzariateste",
+  "email":"camila@gmail.com",
+  "senha":"batata01"
+}

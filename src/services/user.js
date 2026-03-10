@@ -31,3 +31,21 @@ export async function showUser(req, res, _next) {
     return res.status(200).json(u);
 }
 
+export async function  updateUser(req, res, _next) {
+
+    let id = Number(req.params.id); 
+    const {name,type,email,senha} = req.body  ;
+    let u = await prisma.user.findFirst({where : {id:id}});
+
+
+    if(name) u.name = name
+    if(type) u.type = type
+    if(email) u.email = email
+    if(senha) u.senha = senha
+    u.contains;
+
+    return res.status(201).json(u);
+    
+
+}
+
