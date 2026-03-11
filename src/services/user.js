@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { number, z } from 'zod';
 const prisma = new PrismaClient();
+import {attachSave} from "../utils/save.js"
 
 
 //req: requisição oque esta vindo do frontend
