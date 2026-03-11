@@ -34,16 +34,18 @@ content-type: application/json
 GET http://localhost:3000/company?type=bo HTTP/1.1
 content-type: application/json
 
+### ATUALIZANDO HAHA
+
 PUT http://localhost:3000/company/1 HTTP/1.1
 Content-Type: application/json
 
 {
-  "name":         "biro biro",
+  "name":         "biro la",
   "category":     "Alimentação",
   "cnpj":         "12345678000199",
   "places":       "Localização da empresa",
   "zip_code":     "12345-678",
   "addrres":      "Rua Exemplo, 123",
-  "phone":          "(11) 1234-5678",
-  "userId":         1
+  "phone":          "(11) 1234-5678"
+  
 }

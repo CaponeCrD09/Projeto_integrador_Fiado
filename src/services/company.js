@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { attachSave } from "../utils/save";
-
 const prisma = new PrismaClient();
+import { attachSave } from "../utils/save.js";
+
 
 //req: quequisição o qyue esta vindo do frontend
 //res: responder ooque vou responder
@@ -33,9 +33,35 @@ export async function readCompany(req, res, _next) {
         return res.status(200).json(companies);
     }
 
-export async function showCompany(req, res, _next) {
-    let id = Number(req.params.id);
-    let companies = await prisma.company.findFirst({where: {id:id}});
-    return res.status(200).json(companies);
-}
+    export async function showCompany(req, res, _next) {
+        let id = Number(req.params.id);
+        let companies = await prisma.company.findFirst({where: {id:id}});
+        return res.status(200).json(companies);
+    }
+
+    export async function updateCompany(req,res,_next) {
+        let id = Number(req.params.id);
+        const {name,category,cnpj,places,zip_code,addrres,phone} = req.body ;        
+        let c = await prisma.user.findFirst({where : {id:id}});
+        
+        if( !c ){
+            return res.status(404).json("NÃO ENCONTREI O "+ id)
+        }
+        
+        c = attachSave(c,"company");
+
+        if(name)        c.name      = name
+        if(category)    c.category  = category
+        if(cnpj)        c.cnpj      = cnpj
+        if(places)      c.place     = places      
+        if(zip_code)    c.zip_code  = zip_code
+        if(addrres)     c.addrres   = addrres
+        if(phone)       c.phone     = phone
+                
+
+        await c.save();
+
+        return res.status(202).json(c);
+    
+    }
 
