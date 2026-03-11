@@ -37,14 +37,22 @@ export async function  updateUser(req, res, _next) {
     const {name,type,email,senha} = req.body  ;
     let u = await prisma.user.findFirst({where : {id:id}});
 
+    if( !u ){
+        return res.status(404).json("Nao encontri o "+id);
+    }
+
+    u = attachSave(u,'user');
+
 
     if(name) u.name = name
     if(type) u.type = type
     if(email) u.email = email
     if(senha) u.senha = senha
 
+    await u.save();
+
     
-    return res.status(201).json(u);
+    return res.status(202).json(u);
     
 
 }
