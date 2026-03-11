@@ -20,7 +20,7 @@ export async function  readProducts(req, res, _next) {
     if(name) consult.name = {contains: "%" + name + "%"}
     if(type) consult.type = {contains: "%" + type+ "%"}
     if(value) consult.value = {contains: "%" + value + "%"}
-    let p = await prisma.product.findMany({where: consult});
+    let p= await prisma.product.findMany({where: consult});
     return res.status(200).json(p);
 }
 
