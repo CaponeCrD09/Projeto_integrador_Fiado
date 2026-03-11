@@ -1,7 +1,7 @@
-/* import { PrismaClient } from "@prisma/client";
+ import { PrismaClient } from "@prisma/client";
  import { z } from "zod";
  const prisma = new PrismaClient();
- import { attachSave } from ".../utils/save.js";
+ import { attachSave } from "../utils/save.js";
  
 
   export async function createPayment(req, res, _next){
@@ -34,24 +34,27 @@
      return res.status(200).json(p);
  }
 
-export async function editPayment(req, res, _next) {
+export async function updatePayment(req, res, _next) {
     let id = Number(req.params.id);
-    const {value} = readPayment.body;
+    const {value,method,toDate,dueDate,userId} = readPayment.body;
 
     let p = await prisma.user.findFirst({where: {id:id}});
 
     if(!p){
-        return res.status(404).json("Não encrontrei "+id);
+        return res.status(404).json("Não encrontrei "+ id);
     }
     
     p = attachSave(p, 'payment');
     
     if(value) p.value = value;
-    
+    if(method) p.method = method;
+    if(toDate) p.toDate = toDate ;
+    if(dueDate) p.dueDate = dueDate ;
+    if(userId) p.userId = userId;
     await p.save();
 
     return res.status(202).json(p);
 
  }
 
-*/
+

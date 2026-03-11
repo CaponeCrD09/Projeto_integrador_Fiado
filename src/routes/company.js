@@ -6,7 +6,7 @@ const router = Router();
 router.post('/', createCompany);
 router.get("/", readCompany);
 router.get("/:id", showCompany);
-router.put("/:id"),updateCompany);
+router.put("/:id",updateCompany);
 
 
 //ai nenem
