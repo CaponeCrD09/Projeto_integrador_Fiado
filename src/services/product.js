@@ -35,18 +35,23 @@ export async function showProducts(req, res, _next) {
 export async function editProducts(req , res, _next){
 
     let id = Number(req.params.id); 
-    const {companyId,value,name,type,description} = req.body  ;
+    const {value,name,type,description} = req.body  ;
 
     let p = await prisma.product.findFirst({where : {id:id}});
     
     if(!p){
-        return res.status(400).json("Não encontrei" +id);
-}
-  p = attachSave(p, 'products');
+        return res.status(404).json("Não encontrei" +id);
+    }
+    p = attachSave(p, 'product');
 
-  if(companyId,value,name,type,description) p.companyId,value,name,type,description = companyId,value,name,type,description
-  await p.save();
+    if(value) p.value = value;
+    if(name) p.name = name;
+    if(type) p.type = type;
+    if(description) p.description = description;
 
+
+    await p.save();
+    return res.status(202).json(p);
 }
 
 

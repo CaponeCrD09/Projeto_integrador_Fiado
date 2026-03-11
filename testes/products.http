@@ -3,7 +3,7 @@ POST http://localhost:3000/product HTTP/1.1
 Content-Type: application/json
 
 {
-  "companyId":1,
+  "companyId":2,
   "value": 20.00,
   "name": "Produto 2",
   "type": "bike",
@@ -20,13 +20,13 @@ Content-Type: application/json
 GET http://localhost:3000/product?type=bike HTTP/1.1
 Content-Type: application/json
 
-##editando todos os campos dos produtos
+###editando todos os campos dos produtos
 
-PUT http://localhost:3000/product/3 HTTP/1.1
+PUT http://localhost:3000/product/2 HTTP/1.1
 Content-Type: application/json
 
 {
-  "companyId":3,
+  
   "value": 10.00,
   "name": "milena Produto 3",
   "type": "bola",
