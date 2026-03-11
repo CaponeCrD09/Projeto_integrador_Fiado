@@ -20,7 +20,7 @@ export async function  readProducts(req, res, _next) {
     if(name) consult.name = {contains: "%" + name + "%"}
     if(type) consult.type = {contains: "%" + type+ "%"}
     if(value) consult.value = {contains: "%" + value + "%"}
-    let p = await prisma.product.findMany({where: consult});
+    let p= await prisma.product.findMany({where: consult});
     return res.status(200).json(p);
 }
 
@@ -30,11 +30,3 @@ export async function showProducts(req, res, _next) {
     let p = await prisma.product.findFirst({where: {id:id}});
     return res.status(200).json(p);
 }
-
-export async function updateProducts(req , res, _next){
-
-    const data = req.body
-    let u = await prisma.product.product({data});
-    return res.status(201).json(u);
-}
-
