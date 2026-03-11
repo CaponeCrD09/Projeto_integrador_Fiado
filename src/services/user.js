@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 
 //req: requisição oque esta vindo do frontend
-//res; response oque eu vou respoder
+//res; response oque eu vou 
 //next; proximo oque eu vou fazer a seguir
 export async function createUser(req , res, _next){
 
@@ -32,7 +32,7 @@ export async function showUser(req, res, _next) {
 }
 
 export async function  updateUser(req, res, _next) {
-
+     
     let id = Number(req.params.id); 
     const {name,type,email,senha} = req.body  ;
     let u = await prisma.user.findFirst({where : {id:id}});
@@ -42,10 +42,11 @@ export async function  updateUser(req, res, _next) {
     if(type) u.type = type
     if(email) u.email = email
     if(senha) u.senha = senha
-    u.contains;
 
+    
     return res.status(201).json(u);
     
 
 }
+
 
