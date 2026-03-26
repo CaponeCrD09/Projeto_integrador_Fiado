@@ -4,11 +4,11 @@
  import { attachSave } from "../utils/save.js";
  
 
-  export async function createPayment(req, res, _next){
+ 
+ export async function createPayment(req, res, _next){
      const data = req.body;
      let u = await prisma.payment.create({data});
      return res.status(201).json(u);
-
  }
 
   export async function readPayment(req, res, _next) {
@@ -55,6 +55,21 @@ export async function updatePayment(req, res, _next) {
 
     return res.status(202).json(p);
 
+ }
+
+
+  export async function deletePayment(req, res, _next) {
+    const data = res.body;
+    let id = Number(req.params.id);
+    let d = await prisma.payment.findFirst({where: {id:id}});
+     
+     if (!d) {
+        return res.status(404).json("ID apagado ou não existente "+ id);
+        
+    }
+    d = await prisma.payment.delete({where:{id:id}})
+    return res.status(200).json("Pagamento apagado com sucesso");
+    
  }
 
 
