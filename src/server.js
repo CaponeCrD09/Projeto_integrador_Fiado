@@ -4,7 +4,8 @@ import cors from 'cors'; //ele vai permitir a cominuicação com o forntend
 import userRouter from './routes/user.js';
 import productRouter from './routes/product.js';
 import companyRouter from './routes/company.js';
-//import paymentRouter from './routes/payment.js';
+import paymentRouter from './routes/payment.js';
+
 
 
 const app = express(); // estou ciando um app
