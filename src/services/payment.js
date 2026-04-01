@@ -1,75 +1,265 @@
- import { PrismaClient } from "@prisma/client";
- import { z } from "zod";
- const prisma = new PrismaClient();
- import { attachSave } from "../utils/save.js";
- 
+import { PrismaClient } from "@prisma/client";
+import { z }            from "zod";
+import { attachSave }   from "../utils/save.js";
 
- 
- export async function createPayment(req, res, _next){
-     const data = req.body;
-     let u = await prisma.payment.create({data});
-     return res.status(201).json(u);
- }
+const prisma = new PrismaClient();
 
-  export async function readPayment(req, res, _next) {
-   
-     const {value }= req.query
-   
-     let consult= {}
+// ══════════════════════════════════════════════════════════════════════════════
+// SCHEMAS ZOD
+//
+// Zod é uma biblioteca de validação de esquemas que substitui longas cadeias
+// de if/else.  Cada schema descreve a forma e as restrições dos dados.
+// .safeParse() retorna { success, data } ou { success: false, error }.
+// ══════════════════════════════════════════════════════════════════════════════
 
-     if(value)  consult.value =  value
-     
+/** Métodos de pagamento aceitos pela aplicação. */
+const METODOS_PERMITIDOS = ["boleto", "dinheiro físico", "pix", "cartão"];
+
+/**
+ * Schema de ID de rota (req.params.id).
+ * z.coerce converte a string da URL para número antes de validar.
+ * Regras: deve ser inteiro e maior que zero.
+ */
+const idSchema = z.coerce
+    .number({ invalid_type_error: "O ID deve ser um número." })
+    .int(  { message: "O ID deve ser um número inteiro." })
+    .positive({ message: "O ID deve ser maior que zero." });
+
+/**
+ * Schema base dos campos de um pagamento.
+ *
+ * Campos e seus tipos esperados:
+ *  - companyId : inteiro positivo
+ *  - userId    : inteiro positivo
+ *  - value     : número decimal  ≥ 0  e  ≤ R$ 10.000
+ *  - method    : string — um dos valores em METODOS_PERMITIDOS
+ *  - toDate    : string ISO — não pode ser data passada
+ *  - dueDate   : string ISO — não pode ser antes de toDate nem mais de 3 meses depois
+ *
+ * .refine() adiciona validações cruzadas (entre dois campos) que o schema
+ * individual não consegue expressar.
+ */
+const paymentBaseSchema = z.object({
+
+    companyId: z
+        .number({ invalid_type_error: "O campo 'companyId' deve ser um número inteiro (ex: 1, 2, 3)." })
+        .int(      { message: "O campo 'companyId' deve ser um número inteiro, sem decimais." })
+        .positive( { message: "O campo 'companyId' deve ser maior que zero." }),
+
+    userId: z
+        .number({ invalid_type_error: "O campo 'userId' deve ser um número inteiro (ex: 1, 2, 3)." })
+        .int(      { message: "O campo 'userId' deve ser um número inteiro, sem decimais." })
+        .positive( { message: "O campo 'userId' deve ser maior que zero." }),
+
+    value: z
+        .number({ invalid_type_error: "O campo 'value' deve ser um número decimal (ex: 150.00)." })
+        .nonnegative({ message: "O valor do pagamento não pode ser negativo." })
+        .max(10000,  { message: "O valor do pagamento não pode ser maior que R$ 10.000,00." }),
+
+    method: z
+        .string({ invalid_type_error: "O campo 'method' deve ser uma string de texto." })
+        .refine(
+            (m) => METODOS_PERMITIDOS.includes(m),
+            { message: `Método inválido. Use um de: ${METODOS_PERMITIDOS.join(", ")}.` }
+        ),
+
+    toDate: z
+        .string({ invalid_type_error: "O campo 'toDate' deve ser uma string no formato ISO." })
+        .refine((d) => {
+            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+            return new Date(d) >= hoje;
+        }, { message: "A data de início (toDate) não pode ser uma data passada." }),
+
+    dueDate: z
+        .string({ invalid_type_error: "O campo 'dueDate' deve ser uma string no formato ISO." }),
+
+})
+// Validação cruzada 1: dueDate não pode ser anterior a toDate
+.refine(
+    ({ toDate, dueDate }) => new Date(dueDate) >= new Date(toDate),
+    { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
+)
+// Validação cruzada 2: dueDate deve estar dentro do limite de 3 meses
+.refine(
+    ({ toDate, dueDate }) => {
+        const limite = new Date(toDate);
+        limite.setMonth(limite.getMonth() + 3);
+        return new Date(dueDate) <= limite;
+    },
+    { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
+);
+
+/**
+ * Schema para criação (POST) — todos os campos são obrigatórios.
+ * Usa o schema base sem modificações.
+ */
+const createSchema = paymentBaseSchema;
+
+/**
+ * Schema para atualização (PUT) — todos os campos são opcionais.
+ * .partial() torna cada campo do schema base opcional (undefined aceito).
+ * As validações cruzadas de datas só se aplicam se ambos os campos estiverem presentes.
+ */
+const updateSchema = paymentBaseSchema.partial();
+
+/**
+ * Schema de query param para busca (GET /payment?value=X).
+ * A query string chega como string; z.coerce converte para número.
+ */
+const querySchema = z.object({
+    value: z.coerce.number({ invalid_type_error: "O filtro 'value' deve ser um número." }).optional(),
+});
 
 
-
-    let payment = await prisma.payment.findMany({where: consult});
-
-     return res.status(200).json(payment);
-
- }
-
- export async function showPayment(req, res, _next) {
-     let id = Number(req.params.id);
-     let p = await prisma.payment.findFirst({where: {id:id}});
-     return res.status(200).json(p);
- }
-
-export async function updatePayment(req, res, _next) {
-    let id = Number(req.params.id);
-    const {value,method,toDate,dueDate,userId} = readPayment.body;
-
-    let p = await prisma.user.findFirst({where: {id:id}});
-
-    if(!p){
-        return res.status(404).json("Não encrontrei "+ id);
+// ══════════════════════════════════════════════════════════════════════════════
+// HELPER: validate
+//
+// Centraliza o ciclo safeParse → retornar erro 422 ou retornar dados válidos.
+// Todos os controllers chamam esta função; não há lógica de if/else espalhada.
+//
+// @param {z.ZodSchema} schema  - Schema Zod a usar
+// @param {unknown}     input   - Dados a validar
+// @param {Response}    res     - Objeto de resposta Express
+// @returns {object|null}       - Dados validados e tipados, ou null (já respondeu 422)
+// ══════════════════════════════════════════════════════════════════════════════
+function validate(schema, input, res) {
+    const result = schema.safeParse(input);
+    if (!result.success) {
+        // Pega a primeira mensagem de erro do Zod e responde imediatamente
+        const mensagem = result.error.errors[0].message;
+        res.status(422).json({ error: mensagem });
+        return null;
     }
-    
-    p = attachSave(p, 'payment');
-    
-    if(value) p.value = value;
-    if(method) p.method = method;
-    if(toDate) p.toDate = toDate ;
-    if(dueDate) p.dueDate = dueDate ;
-    if(userId) p.userId = userId;
+    return result.data;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HELPER: findPaymentOrFail
+//
+// Busca um pagamento pelo ID e responde 404 caso não exista.
+// Evita repetir o mesmo bloco em show, update e delete.
+//
+// @param {number}   id   - ID já validado
+// @param {Response} res  - Objeto de resposta Express
+// @returns {object|null} - Registro encontrado ou null (já respondeu 404)
+// ══════════════════════════════════════════════════════════════════════════════
+async function findPaymentOrFail(id, res) {
+    const p = await prisma.payment.findFirst({ where: { id } });
+    if (!p) {
+        res.status(404).json({ error: `Pagamento com ID ${id} não encontrado.` });
+        return null;
+    }
+    return p;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTROLLERS
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /payment
+ * Cria um novo pagamento após validar todos os campos e verificar
+ * a existência de userId e companyId no banco de dados.
+ */
+export async function createPayment(req, res, _next) {
+    // 1. Valida o corpo da requisição com o schema de criação
+    const data = validate(createSchema, req.body, res);
+    if (!data) return;
+
+    // 2. Verifica se userId existe no banco
+    const user = await prisma.user.findFirst({ where: { id: data.userId } });
+    if (!user) return res.status(404).json({ error: `Usuário com ID ${data.userId} não encontrado.` });
+
+    // 3. Verifica se companyId existe no banco
+    const company = await prisma.company.findFirst({ where: { id: data.companyId } });
+    if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
+
+    const u = await prisma.payment.create({ data });
+    return res.status(201).json(u);
+}
+
+/**
+ * GET /payment
+ * Lista todos os pagamentos, com filtro opcional por valor (?value=X).
+ */
+export async function readPayment(req, res, _next) {
+    // Valida e converte o query param (string → número)
+    const query = validate(querySchema, req.query, res);
+    if (!query) return;
+
+    const where = query.value !== undefined ? { value: query.value } : {};
+    const payments = await prisma.payment.findMany({ where });
+    return res.status(200).json(payments);
+}
+
+/**
+ * GET /payment/:id
+ * Retorna um pagamento específico pelo ID.
+ * Valida o ID e retorna 404 se não existir.
+ */
+export async function showPayment(req, res, _next) {
+    const id = validate(idSchema, req.params.id, res);
+    if (!id) return;
+
+    const p = await findPaymentOrFail(id, res);
+    if (!p) return;
+
+    return res.status(200).json(p);
+}
+
+/**
+ * PUT /payment/:id
+ * Atualiza parcialmente um pagamento.
+ * Valida o ID, verifica existência, valida os campos enviados e,
+ * se userId ou companyId forem alterados, confirma que existem no banco.
+ */
+export async function updatePayment(req, res, _next) {
+    // 1. Valida o ID da rota
+    const id = validate(idSchema, req.params.id, res);
+    if (!id) return;
+
+    // 2. Confirma que o pagamento existe
+    let p = await findPaymentOrFail(id, res);
+    if (!p) return;
+
+    // 3. Valida os campos do body (schema parcial — tudo opcional)
+    const data = validate(updateSchema, req.body, res);
+    if (!data) return;
+
+    // 4. Se userId foi enviado, verifica existência
+    if (data.userId !== undefined) {
+        const user = await prisma.user.findFirst({ where: { id: data.userId } });
+        if (!user) return res.status(404).json({ error: `Usuário com ID ${data.userId} não encontrado.` });
+    }
+
+    // 5. Se companyId foi enviado, verifica existência
+    if (data.companyId !== undefined) {
+        const company = await prisma.company.findFirst({ where: { id: data.companyId } });
+        if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
+    }
+
+    // 6. Aplica apenas os campos presentes no body
+    p = attachSave(p, "payment");
+    Object.assign(p, data);
     await p.save();
 
     return res.status(202).json(p);
+}
 
- }
+/**
+ * DELETE /payment/:id
+ * Remove um pagamento pelo ID.
+ * Valida o ID e retorna 404 se não existir.
+ */
+export async function deletePayment(req, res, _next) {
+    const id = validate(idSchema, req.params.id, res);
+    if (!id) return;
 
+    const d = await findPaymentOrFail(id, res);
+    if (!d) return;
 
-  export async function deletePayment(req, res, _next) {
-    const data = res.body;
-    let id = Number(req.params.id);
-    let d = await prisma.payment.findFirst({where: {id:id}});
-     
-     if (!d) {
-        return res.status(404).json("ID apagado ou não existente "+ id);
-        
-    }
-    d = await prisma.payment.delete({where:{id:id}})
-    return res.status(200).json("Pagamento apagado com sucesso");
-    
- }
-
-
+    await prisma.payment.delete({ where: { id } });
+    return res.status(200).json({ message: "Pagamento apagado com sucesso." });
+}

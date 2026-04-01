@@ -12,7 +12,7 @@ content-type: application/json
     "method":"pix",  
     "toDate":"1970-01-01T00:00:00.000Z",       
     "dueDate":"1970-01-02T00:00:00.000Z",        
-    "userId":1
+    "userId":2
 }
 
 ### Listar todos os pagamentos
@@ -40,7 +40,6 @@ Content-type: application/json
 PUT  http://localhost:3000/payment/1 HTTP/1.1
 Content-type: application/json
 
-
 {
     "companyId":1,
     "value":200.0,      
@@ -54,3 +53,500 @@ Content-type: application/json
 ###
 DELETE http://localhost:3000/payment/1 HTTP/1.1
 Content-type: application/json
+
+
+# ═══════════════════════════════════════════════════════
+# TESTES DE VALIDAÇÃO — POST (criar pagamento)
+# ═══════════════════════════════════════════════════════
+
+### ✅ POST válido → deve retornar 201
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 200.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-06-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - value negativo → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": -50.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - value acima de R$10.000 → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 15000.0,
+    "method": "boleto",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - value não é número (string) → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": "duzentos",
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - userId não é inteiro (float) → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1.5
+}
+
+### ❌ POST - userId <= 0 → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 0
+}
+
+### ❌ POST - companyId não é inteiro (string) → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": "um",
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - companyId <= 0 → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": -3,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - method inválido → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "transferência",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - method não é string (número) → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": 123,
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - toDate no passado (2024) → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2024-01-01T00:00:00.000Z",
+    "dueDate": "2024-02-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - toDate não é string (número) → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": 20260401,
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - dueDate anterior ao toDate → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-06-01T00:00:00.000Z",
+    "dueDate": "2026-04-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - dueDate mais de 3 meses após toDate → 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-09-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ POST - userId inexistente no banco → 404
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 9999
+}
+
+### ❌ POST - companyId inexistente no banco → 404
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 9999,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+# ═══════════════════════════════════════════════════════
+# TESTES DE VALIDAÇÃO — GET (buscar pagamento)
+# ═══════════════════════════════════════════════════════
+
+### ✅ GET por ID válido → 200
+GET http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+### ❌ GET - ID inexistente → 404
+GET http://localhost:3000/payment/9999 HTTP/1.1
+Content-type: application/json
+
+### ❌ GET - ID igual a zero → 422
+GET http://localhost:3000/payment/0 HTTP/1.1
+Content-type: application/json
+
+### ❌ GET - ID negativo → 422
+GET http://localhost:3000/payment/-5 HTTP/1.1
+Content-type: application/json
+
+### ❌ GET - ID não é número → 422
+GET http://localhost:3000/payment/abc HTTP/1.1
+Content-type: application/json
+
+# ═══════════════════════════════════════════════════════
+# TESTES DE VALIDAÇÃO — PUT (atualizar pagamento)
+# ═══════════════════════════════════════════════════════
+
+### ✅ PUT válido → 202
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": 300.0,
+    "method": "boleto"
+}
+
+### ❌ PUT - ID inexistente → 404
+PUT http://localhost:3000/payment/9999 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": 100.0
+}
+
+### ❌ PUT - ID igual a zero → 422
+PUT http://localhost:3000/payment/0 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": 100.0
+}
+
+### ❌ PUT - value negativo → 422
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": -1.0
+}
+
+### ❌ PUT - value acima de R$10.000 → 422
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": 10001.0
+}
+
+### ❌ PUT - userId <= 0 → 422
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "userId": 0
+}
+
+### ❌ PUT - userId inexistente no banco → 404
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "userId": 9999
+}
+
+### ❌ PUT - method inválido → 422
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "method": "cheque"
+}
+
+# ═══════════════════════════════════════════════════════
+# TESTES DE VALIDAÇÃO — DELETE (remover pagamento)
+# ═══════════════════════════════════════════════════════
+
+### ✅ DELETE válido → 200
+DELETE http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+### ❌ DELETE - ID inexistente → 404
+DELETE http://localhost:3000/payment/9999 HTTP/1.1
+Content-type: application/json
+
+### ❌ DELETE - ID igual a zero → 422
+DELETE http://localhost:3000/payment/0 HTTP/1.1
+Content-type: application/json
+
+### ❌ DELETE - ID negativo → 422
+DELETE http://localhost:3000/payment/-1 HTTP/1.1
+Content-type: application/json
+
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": -50.0,
+    "method": "pix",
+    "toDate": "1970-01-01T00:00:00.000Z",
+    "dueDate": "1970-01-02T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE REGRA 2 (POST) - Valor acima de R$10.000 → deve retornar 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 15000.0,
+    "method": "boleto",
+    "toDate": "1970-01-01T00:00:00.000Z",
+    "dueDate": "1970-01-02T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE REGRA 1 (PUT) - Valor negativo no update → deve retornar 422
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": -1.0
+}
+
+### ❌ TESTE REGRA 2 (PUT) - Valor acima de R$10.000 no update → deve retornar 422
+PUT http://localhost:3000/payment/1 HTTP/1.1
+Content-type: application/json
+
+{
+    "value": 10001.0
+}
+
+### ✅ TESTE LIMITE EXATO (POST) - Exatamente R$10.000 → deve retornar 201
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 10000.0,
+    "method": "pix",
+    "toDate": "1970-01-01T00:00:00.000Z",
+    "dueDate": "1970-01-02T00:00:00.000Z",
+    "userId": 1
+}
+
+### ✅ TESTE VÁLIDO (POST) - Valor positivo normal → deve retornar 201
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 200.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-06-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE - userId inexistente → deve retornar 404
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 9999
+}
+
+### ❌ TESTE - companyId inexistente → deve retornar 404
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 9999,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE - toDate no passado (2024) → deve retornar 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2024-01-01T00:00:00.000Z",
+    "dueDate": "2024-02-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE - dueDate anterior ao toDate → deve retornar 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-06-01T00:00:00.000Z",
+    "dueDate": "2026-04-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE - dueDate com mais de 3 meses após toDate → deve retornar 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "pix",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-09-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ❌ TESTE - método inválido → deve retornar 422
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 100.0,
+    "method": "transferência",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ✅ TESTE - método "dinheiro físico" → deve retornar 201
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 50.0,
+    "method": "dinheiro físico",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-05-01T00:00:00.000Z",
+    "userId": 1
+}
+
+### ✅ TESTE - método "cartão" → deve retornar 201
+POST http://localhost:3000/payment HTTP/1.1
+Content-type: application/json
+
+{
+    "companyId": 1,
+    "value": 75.0,
+    "method": "cartão",
+    "toDate": "2026-04-01T00:00:00.000Z",
+    "dueDate": "2026-06-30T00:00:00.000Z",
+    "userId": 1
+}
