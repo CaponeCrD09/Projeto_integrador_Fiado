@@ -28,6 +28,9 @@ model Company {
   products  Product[]    
   payments  Payment[]
 
+  logoUrl   String?
+  deletedAt DateTime?
+
   createAt  DateTime    @default(now())
   updateAt  DateTime    @updatedAt
   

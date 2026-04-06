@@ -4,13 +4,13 @@ POST http://localhost:3000/company HTTP/1.1
 content-type: application/json
 
 {
-  "name":         "Neres Pao",
-  "category":     "Alimentação",
-  "cnpj":         "12345678000199",
-  "places":       "Localização da empresa",
-  "zip_code":     "12345-678",
-  "addrres":      "Rua Exemplo, 123",
-  "phone":          "(11) 1234-5678",
+  "name":         "abracadabra",
+  "category":     "balas",
+  "cnpj":         "xxx.xx1.x4x..27",
+  "places":       "aracy",
+  "zip_code":     "1356899",
+  "addrres":      "rua 2",
+  "phone":          "190",
   "userId":         1
 }
 
@@ -20,13 +20,13 @@ GET http://localhost:3000/company HTTP/1.1
 content-type: application/json
 
 
-### busca apens um ususario
-GET http://localhost:3000/company/id HTTP/1.1
+### busca apens uma compania
+GET http://localhost:3000/company/2 HTTP/1.1
 content-type: application/json
 
 ### BUSCAR POR NOME
 
-GET http://localhost:3000/company?name=teste HTTP/1.1
+GET http://localhost:3000/company?name=abrobrinha HTTP/1.1
 content-type: application/json
 
 ### BUSCAR POR TYPE
@@ -40,12 +40,45 @@ PUT http://localhost:3000/company/1 HTTP/1.1
 Content-Type: application/json
 
 {
-  "name":         "biro la",
+  "name":         "teste",
   "category":     "Alimentação",
   "cnpj":         "12345678000199",
   "places":       "Localização da empresa",
   "zip_code":     "12345-678",
   "addrres":      "Rua Exemplo, 123",
-  "phone":          "(11) 1234-5678"
+  "phone":        "(11) 1234-5678"
   
 }
+
+
+### DELETE USUARIO
+DELETE http://localhost:3000/company/1 HTTP/1.1
+Content-Type: application/json
+
+
+### CRIAR EMPRESA COM UPLOAD DE IMAGEM NO IMGBB (Basta arrumar o caminho na seta < abaixo)
+POST http://localhost:3000/company HTTP/1.1
+Content-Type: multipart/form-data; boundary=----FrontBoundary
+
+------FrontBoundary
+Content-Disposition: form-data; name="name"
+
+Empresa com Logo
+------FrontBoundary
+Content-Disposition: form-data; name="category"
+
+Tech
+------FrontBoundary
+Content-Disposition: form-data; name="cnpj"
+
+11.222.333/0001-44
+------FrontBoundary
+Content-Disposition: form-data; name="userId"
+
+1
+------FrontBoundary
+Content-Disposition: form-data; name="logoFile"; filename="minha_foto.png"
+Content-Type: image/png
+
+< C:\Users\djand\qualquer_foto_ai.png
+------FrontBoundary--
