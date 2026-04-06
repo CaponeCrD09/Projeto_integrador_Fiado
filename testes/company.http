@@ -50,6 +50,7 @@ Content-Type: application/json
   
 }
 
+<<<<<<< HEAD
 
 ### DELETE USUARIO
 DELETE http://localhost:3000/company/1 HTTP/1.1
@@ -82,3 +83,5 @@ Content-Type: image/png
 
 < C:\Users\djand\qualquer_foto_ai.png
 ------FrontBoundary--
+=======
+>>>>>>> 3793d4409de6a026239df79ede2dfecc06debb4c
