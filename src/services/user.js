@@ -58,4 +58,24 @@ export async function  updateUser(req, res, _next) {
 
 }
 
+export async function deletando(req,res,_net) {
+    
+    let id = Number(req.params.id);
+    const u = await prisma.user.findFirst({where : {id:id}});
+    
+    
+    if(u){
+        
+         await prisma.user.delete({where : {id:id}});
+    }
+    else{
+
+        return res.status(201).json(" nao encontrado");
+    }
+
+    return res.status(201).json("user deletado");
+
+
+}
+
 
