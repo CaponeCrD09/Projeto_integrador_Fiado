@@ -39,7 +39,7 @@ const idSchema = z.coerce
  * .refine() adiciona validações cruzadas (entre dois campos) que o schema
  * individual não consegue expressar.
  */
-const paymentBaseSchema = z.object({
+const paymentFields = z.object({
 
     companyId: z
         .number({ invalid_type_error: "O campo 'companyId' deve ser um número inteiro (ex: 1, 2, 3)." })
@@ -73,7 +73,9 @@ const paymentBaseSchema = z.object({
     dueDate: z
         .string({ invalid_type_error: "O campo 'dueDate' deve ser uma string no formato ISO." }),
 
-})
+});
+
+const paymentBaseSchema = paymentFields
 // Validação cruzada 1: dueDate não pode ser anterior a toDate
 .refine(
     ({ toDate, dueDate }) => new Date(dueDate) >= new Date(toDate),
@@ -100,7 +102,27 @@ const createSchema = paymentBaseSchema;
  * .partial() torna cada campo do schema base opcional (undefined aceito).
  * As validações cruzadas de datas só se aplicam se ambos os campos estiverem presentes.
  */
-const updateSchema = paymentBaseSchema.partial();
+const updateSchema = paymentFields.partial()
+.refine(
+    (data) => {
+        if (data.toDate && data.dueDate) {
+            return new Date(data.dueDate) >= new Date(data.toDate);
+        }
+        return true;
+    },
+    { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
+)
+.refine(
+    (data) => {
+        if (data.toDate && data.dueDate) {
+            const limite = new Date(data.toDate);
+            limite.setMonth(limite.getMonth() + 3);
+            return new Date(data.dueDate) <= limite;
+        }
+        return true;
+    },
+    { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
+);
 
 /**
  * Schema de query param para busca (GET /payment?value=X).
