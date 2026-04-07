@@ -4,7 +4,7 @@ POST http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "milena",
+  "name": "marcius",
   "type": "pizzariateste",
   "email":"milena@gmail.com",
   "senha":"12345"
@@ -41,3 +41,7 @@ content-type: application/json
   "email":"camila@gmail.com",
   "senha":"batata01"
 }
+
+### deleta um usuario
+DELETE  http://localhost:3000/user/6 HTTP/1.1
+content-type: application/json

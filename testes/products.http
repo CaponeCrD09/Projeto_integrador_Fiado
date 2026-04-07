@@ -22,7 +22,7 @@ Content-Type: application/json
 
 ###editando todos os campos dos produtos
 
-PUT http://localhost:3000/product/2 HTTP/1.1
+PUT http://localhost:3000/product/1 HTTP/1.1
 Content-Type: application/json
 
 {

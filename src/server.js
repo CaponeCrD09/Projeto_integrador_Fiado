@@ -13,7 +13,7 @@ app.use(express.json()); // aqui quam fomato json
 
 app.use('/user',userRouter);
 app.use('/product',productRouter);
-app.use('/payment',paymentRouter);
+//app.use('/payment',paymentRouter);
 app.use('/company',companyRouter);
 
 
