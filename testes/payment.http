@@ -10,7 +10,7 @@ content-type: application/json
     "companyId":,
     "value":20.0,      
     "method":"pix",  
-    "toDate":"1970-01-01T00:00:00.000Z",       
+    "toDate":"1970-01-01T00:00:01.000Z",       
     "dueDate":"1970-01-02T00:00:00.000Z",        
     "userId":
 }
