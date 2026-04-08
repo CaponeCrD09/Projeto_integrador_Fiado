@@ -7,12 +7,12 @@ content-type: application/json
 //next; função para passar para o próximo middleware, caso haja algum erro ou algo do tipo, ele passa para o próximo middleware de tratamento de erros
 
 {
-    "companyId":,
+    "companyId":1,
     "value":20.0,      
     "method":"pix",  
     "toDate":"1970-01-01T00:00:01.000Z",       
     "dueDate":"1970-01-02T00:00:00.000Z",        
-    "userId":
+    "userId":4
 }
 
 ### Listar todos os pagamentos
