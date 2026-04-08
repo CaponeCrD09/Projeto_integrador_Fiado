@@ -6,8 +6,8 @@ content-type: application/json
 {
   "name":         "abracadabra",
   "category":     "balas",
-  "cnpj":         "xxx.xx1.x4x..27",
-  "places":       "aracy",
+  "cnpj":         "12345678000199",
+  "places":       "adacy",
   "zip_code":     "1356899",
   "addrres":      "rua 2",
   "phone":          "190",
@@ -21,7 +21,7 @@ content-type: application/json
 
 
 ### busca apens uma compania
-GET https://projeto-integrador-fiado.onrender.com/company/2 HTTP/1.1
+GET http://localhost:3000/company/2 HTTP/1.1
 content-type: application/json
 
 ### BUSCAR POR NOME
