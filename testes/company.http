@@ -1,6 +1,6 @@
 
 ### criando os companias
-POST http://localhost:3000/company HTTP/1.1
+POST https://projeto-integrador-fiado.onrender.com/company HTTP/1.1
 content-type: application/json
 
 {
@@ -16,27 +16,27 @@ content-type: application/json
 
 
 ### Listar todos as companias.
-GET http://localhost:3000/company HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/company HTTP/1.1
 content-type: application/json
 
 
 ### busca apens uma compania
-GET http://localhost:3000/company/2 HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/company/2 HTTP/1.1
 content-type: application/json
 
 ### BUSCAR POR NOME
 
-GET http://localhost:3000/company?name=abrobrinha HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/company?name=abrobrinha HTTP/1.1
 content-type: application/json
 
 ### BUSCAR POR TYPE
 
-GET http://localhost:3000/company?type=bo HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/company?type=bo HTTP/1.1
 content-type: application/json
 
 ### ATUALIZANDO HAHA
 
-PUT http://localhost:3000/company/1 HTTP/1.1
+PUT https://projeto-integrador-fiado.onrender.com/company/1 HTTP/1.1
 Content-Type: application/json
 
 {
