@@ -1,38 +1,38 @@
 
 ### criando um usuario
-POST http://localhost:3000/user HTTP/1.1
+POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "marcius",
+  "name": "teste",
   "type": "pizzariateste",
-  "email":"milena@gmail.com",
+  "email":"teste@gmail.com",
   "senha":"12345"
 }
 
 ### Listar todos os usuarios
 
-GET http://localhost:3000/user HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
 content-type: application/json
 
 ### buscar apenas um usuario
 
-GET http://localhost:3000/user/1 HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
 content-type: application/json
 
 ### buscar por nome
 
-GET http://localhost:3000/user?name=teste HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/user?name=teste HTTP/1.1
 content-type: application/json
 
 ### buscar por type
 
-GET http://localhost:3000/user?type=bo HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/user?type=bo HTTP/1.1
 content-type: application/json
 
 ### edita user 
 
-PUT http://localhost:3000/user/1 HTTP/1.1
+PUT https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
 content-type: application/json
 
 {
@@ -43,5 +43,5 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE  http://localhost:3000/user/6 HTTP/1.1
+DELETE  https://projeto-integrador-fiado.onrender.com/user/6 HTTP/1.1
 content-type: application/json
