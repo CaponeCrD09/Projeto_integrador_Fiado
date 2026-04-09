@@ -1,18 +1,14 @@
  ### criando os pagamentos
-POST https://projeto-integrador-fiado.onrender.com/payment HTTP/1.1
+POST http://localhost:3000/payment HTTP/1.1
 content-type: application/json
-
-//req: request, ou seja, a requisição que o frontend está fazendo para o backend, onde eu posso pegar os dados que estão sendo enviados pelo frontend, como por exemplo, os dados de um formulário ou os parâmetros de uma URL
-//res; response, ou seja, a resposta que o backend vai enviar para o frontend, onde eu posso enviar os dados que eu quero que o frontend receba, como por exemplo, os dados de um produto ou uma mensagem de erro
-//next; função para passar para o próximo middleware, caso haja algum erro ou algo do tipo, ele passa para o próximo middleware de tratamento de erros
 
 {
     "companyId":1,
     "value":20.0,      
     "method":"pix",  
-    "toDate":"1970-01-01T00:00:01.000Z",       
-    "dueDate":"1970-01-02T00:00:00.000Z",        
-    "userId":4
+    "toDate":"2026-04-08T00:00:01.000Z",       
+    "dueDate":"2026-04-10T00:00:00.000Z",        
+    "userId":1
 }
 
 ### Listar todos os pagamentos

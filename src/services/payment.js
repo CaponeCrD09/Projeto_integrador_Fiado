@@ -148,7 +148,7 @@ function validate(schema, input, res) {
     const result = schema.safeParse(input);
     if (!result.success) {
         // Pega a primeira mensagem de erro do Zod e responde imediatamente
-        const mensagem = result.error.errors[0].message;
+        const mensagem = result.error.issues[0].message;
         res.status(422).json({ error: mensagem });
         return null;
     }
