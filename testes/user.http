@@ -1,21 +1,31 @@
 
-### criando um usuario
+### criando um usuario (type será automaticamente "userClient")
+### O campo "type" NÃO precisa ser enviado — o sistema calcula sozinho
 POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
 content-type: application/json
 
 {
   "name": "teste",
-  "type": "pizzariateste",
   "email":"teste@gmail.com",
   "senha":"12345"
 }
 
-### Listar todos os usuarios
+### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
 GET https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
 content-type: application/json
 
-### buscar apenas um usuario
+### Listar apenas userOwner (usuários que possuem empresa vinculada)
+
+GET https://projeto-integrador-fiado.onrender.com/user?type=userOwner HTTP/1.1
+content-type: application/json
+
+### Listar apenas userClient (usuários sem empresa vinculada)
+
+GET https://projeto-integrador-fiado.onrender.com/user?type=userClient HTTP/1.1
+content-type: application/json
+
+### buscar apenas um usuario (type dinâmico + empresas vinculadas incluídas)
 
 GET https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
 content-type: application/json
@@ -25,19 +35,13 @@ content-type: application/json
 GET https://projeto-integrador-fiado.onrender.com/user?name=teste HTTP/1.1
 content-type: application/json
 
-### buscar por type
-
-GET https://projeto-integrador-fiado.onrender.com/user?type=bo HTTP/1.1
-content-type: application/json
-
-### edita user 
+### edita user (type NÃO pode ser alterado manualmente — é recalculado)
 
 PUT https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
 content-type: application/json
 
 {
   "name": "camila cristina",
-  "type": "pizzariateste",
   "email":"camila@gmail.com",
   "senha":"batata01"
 }

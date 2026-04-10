@@ -6,10 +6,29 @@ import { attachSave } from "../utils/save.js";
 // res: response (o que eu vou enviar de volta)
 // next: proximo (o que eu vou fazer a seguir)
 
+// Função auxiliar: determina o type do usuário com base na existência de empresas vinculadas
+async function resolveUserType(userId) {
+    const companyCount = await prisma.company.count({ where: { userId: userId } });
+    return companyCount > 0 ? "userOwner" : "userClient";
+}
+
 export async function createUser(req, res, _next) {
     try {
-        const data = req.body;
-        let u = await prisma.user.create({ data });
+        const { name, email, senha } = req.body;
+
+        // O campo "type" NÃO é aceito do frontend — será calculado automaticamente
+        // O type é determinado pela relação: se o user já possui alguma Company vinculada → userOwner, senão → userClient
+
+        // Cria o usuário com type = "userClient" por padrão (novo usuário nunca tem empresa vinculada ainda)
+        let u = await prisma.user.create({
+            data: {
+                name,
+                type: "userClient",
+                email,
+                senha,
+            },
+        });
+
         return res.status(201).json(u);
     } catch (error) {
         return res.status(500).json({ erro: "Erro ao criar usuário.", detalhe: error.message });
@@ -22,10 +41,25 @@ export async function readUser(req, res, _next) {
         let consult = {};
 
         if (name) consult.name = { contains: name };
-        if (type) consult.type = { contains: type };
         if (email) consult.email = { contains: email };
-        
-        let users = await prisma.user.findMany({ where: consult });
+
+        // Busca todos os usuários com suas empresas vinculadas
+        let users = await prisma.user.findMany({
+            where: consult,
+            include: { companies: true },
+        });
+
+        // Calcula o type dinamicamente para cada usuário baseado na relação com Company
+        users = users.map((u) => ({
+            ...u,
+            type: u.companies && u.companies.length > 0 ? "userOwner" : "userClient",
+        }));
+
+        // Se o filtro de type foi passado na query, filtra após o cálculo dinâmico
+        if (type) {
+            users = users.filter((u) => u.type === type);
+        }
+
         return res.status(200).json(users);
     } catch (error) {
         return res.status(500).json({ erro: "Erro ao buscar usuários.", detalhe: error.message });
@@ -39,11 +73,17 @@ export async function showUser(req, res, _next) {
             return res.status(400).json({ erro: "ID deve ser um número válido." });
         }
 
-        let u = await prisma.user.findFirst({ where: { id: id } });
-        
+        let u = await prisma.user.findFirst({
+            where: { id: id },
+            include: { companies: true },
+        });
+
         if (!u) {
             return res.status(404).json({ erro: "Não encontrei o usuário com ID " + id });
         }
+
+        // Calcula o type dinamicamente
+        u.type = u.companies && u.companies.length > 0 ? "userOwner" : "userClient";
 
         return res.status(200).json(u);
     } catch (error) {
@@ -58,7 +98,8 @@ export async function updateUser(req, res, _next) {
             return res.status(400).json({ erro: "ID deve ser um número válido." });
         }
 
-        const { name, type, email, senha } = req.body;
+        // O campo "type" não é aceito do frontend para evitar manipulação manual de role
+        const { name, email, senha } = req.body;
         let u = await prisma.user.findFirst({ where: { id: id } });
 
         if (!u) {
@@ -68,9 +109,11 @@ export async function updateUser(req, res, _next) {
         u = attachSave(u, 'user');
 
         if (name) u.name = name;
-        if (type) u.type = type;
         if (email) u.email = email;
         if (senha) u.senha = senha;
+
+        // Recalcula o type após salvar, refletindo o estado real do banco
+        u.type = await resolveUserType(id);
 
         await u.save();
 
@@ -99,3 +142,4 @@ export async function deletando(req, res, _next) {
         return res.status(500).json({ erro: "Erro ao deletar usuário.", detalhe: error.message });
     }
 }
+
