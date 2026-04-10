@@ -17,7 +17,7 @@ app.use(express.json()); // aqui quam fomato json
 app.use('/user', userRouter);
 app.use('/product', authMiddleware, productRouter);
 app.use('/payment', authMiddleware, paymentRouter);
-app.use('/company', authMiddleware, companyRouter);
+app.use('/company', companyRouter);
 
 
 const PORT = process.env.PORT || 3000;

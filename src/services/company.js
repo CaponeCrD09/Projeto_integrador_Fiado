@@ -48,7 +48,7 @@ import { uploadToImgBB } from "../utils/imgbb.js";
 
     export async function readCompany(req, res, _next) {
     const {name,category,place,cnpj,zipCode,addrres,phone,userId} = req.query;
-    let consult = { deletedAt: null } // Filtra para mostrar apenas empresas ativas, ocultando as "apagadas"
+    let consult = { deletedAt: null, id: Number(req.companyId) } // Filtra para mostrar apenas a própria empresa
 
     // Prisma "contains" auto aplica o "%" por trás, não precisamos passar na string manualmente
     if(name) consult.name = {contains: name};
@@ -75,6 +75,12 @@ import { uploadToImgBB } from "../utils/imgbb.js";
 
     export async function showCompany(req, res, _next) {
     let id = Number(req.params.id);
+
+    // Regra: Bloquear acesso não autorizado a registros de outra empresa
+    if (id !== Number(req.companyId)) {
+        return res.status(403).json({ erro: "Acesso negado: Você só pode acessar os registros da sua própria empresa." });
+    }
+
     let company = await prisma.company.findFirst({
         where: {id:id, deletedAt: null},
         include: { payments: true } // Opcional, retornando também os pagamentos
@@ -89,6 +95,12 @@ import { uploadToImgBB } from "../utils/imgbb.js";
 
     export async function updateCompany(req,res,_next) {
     let id = Number(req.params.id);
+
+    // Regra: Bloquear modificação de registros de outra empresa
+    if (id !== Number(req.companyId)) {
+        return res.status(403).json({ erro: "Acesso negado: Você só pode atualizar a sua própria empresa." });
+    }
+
     const {name,category,cnpj,places,zip_code,addrres,phone} = req.body ;        
     let c = await prisma.company.findFirst({where : {id:id, deletedAt: null}});
     
@@ -134,6 +146,11 @@ import { uploadToImgBB } from "../utils/imgbb.js";
 export async function deletCompany(req,res,_next) {
     let id = Number(req.params.id);
     
+    // Regra: Bloquear exclusão de outra empresa
+    if (id !== Number(req.companyId)) {
+        return res.status(403).json({ erro: "Acesso negado: Você só pode deletar a sua própria empresa." });
+    }
+
     if (isNaN(id)) {
         return res.status(400).json({ erro: "ID inválido fornecido." });
     }
