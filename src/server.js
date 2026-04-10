@@ -8,14 +8,16 @@ import paymentRouter from './routes/payment.js';
 
 
 
+import { authMiddleware } from './middlewares/auth.js';
+
 const app = express(); // estou ciando um app
 app.use(cors()); //aqui falo qual os cors
 app.use(express.json()); // aqui quam fomato json
 
-app.use('/user',userRouter);
-app.use('/product',productRouter);
-app.use('/payment',paymentRouter);
-app.use('/company',companyRouter);
+app.use('/user', userRouter);
+app.use('/product', authMiddleware, productRouter);
+app.use('/payment', authMiddleware, paymentRouter);
+app.use('/company', authMiddleware, companyRouter);
 
 
 const PORT = process.env.PORT || 3000;
