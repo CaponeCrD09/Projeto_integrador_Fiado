@@ -83,11 +83,23 @@ export async function editProducts(req, res, _next) {
 export async function deleteProducts(req, res, _next) {
 
     let id = Number(req.params.id);
-    let d = await prisma.product.findFirst({ where: { id: id } });
+    let userId = req.body.userId || Number(req.query.userId) || Number(req.headers.userid);
+
+    if (!userId) {
+        return res.status(400).json({ error: "É necessário informar o userId para excluir o produto." });
+    }
+
+    let d = await prisma.product.findFirst({
+        where: { id: id },
+        include: { companies: true }
+    });
 
     if (!d) {
-        return res.status(202).json("Não encontrado" + id);
+        return res.status(404).json({ error: "Não encontrado" + id });
+    }
 
+    if (d.companies.userId !== userId) {
+        return res.status(403).json({ error: "Apenas o dono do produto pode excluí-lo." });
     }
 
     await prisma.product.delete({ where: { id: id } });
