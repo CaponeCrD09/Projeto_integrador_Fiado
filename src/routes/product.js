@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createProducts, readProducts, showProducts, editProducts, deleteProducts } from '../services/product.js';
 
 const router = Router();
+
 // const zod = z();
 
 router.post('/', authMiddleware, createProducts);
