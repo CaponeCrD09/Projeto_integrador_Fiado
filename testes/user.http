@@ -6,7 +6,7 @@ content-type: application/json
 {
   "email":"teste@gmail.com",
   "senha":"12345"
-  ""
+  
 }
 
 ### criando um usuario (type será automaticamente "userClient")
@@ -15,8 +15,8 @@ POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "FELIPE_2",
-  "email":"teste@gmail.com",
+  "name": "FELIPE_5",
+  "email":"testeA5@gmail.com",
   "senha":"12345",
   "type":"userClient"
 }
