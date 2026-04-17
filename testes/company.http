@@ -3,18 +3,17 @@
 # VARIÁVEIS GLOBAIS
 # =============================================
 @baseUrl = https://projeto-integrador-fiado.onrender.com
-@email   = teste@gmail.com
-@senha   = 12345
+@email   = flinho@gmail.co
+@senha   = 1234
 
 
 # =============================================
 # PASSO 1: Login — o token é capturado automaticamente
 # =============================================
-# Clique em "Send Request" nesta requisição.
+# Clique em "Send Request" no login abaixo.
 # A variável {{token}} será preenchida sozinha nas próximas.
 
 # @name login
-### Login (execute primeiro!)
 POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
@@ -22,6 +21,8 @@ content-type: application/json
   "email": "{{email}}",
   "senha": "{{senha}}"
 }
+
+###
 
 @token = {{login.response.body.$.token}}
 
@@ -38,12 +39,12 @@ Authorization: Bearer {{token}}
 {
   "name":     "abracadabra",
   "category": "balas",
-  "cnpj":     "12345678000199",
+  "cnpj":     "1234520199",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
   "phone":    "190",
-  "userId":   1
+  "userId":   2
 }
 
 
