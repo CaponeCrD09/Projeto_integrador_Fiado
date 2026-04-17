@@ -1,4 +1,13 @@
 
+### Login do usuário (retorna token JWT)
+POST https://projeto-integrador-fiado.onrender.com/user/login HTTP/1.1
+content-type: application/json
+
+{
+  "email":"teste@gmail.com",
+  "senha":"12345"
+}
+
 ### criando um usuario (type será automaticamente "userClient")
 ### O campo "type" NÃO precisa ser enviado — o sistema calcula sozinho
 POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
@@ -7,9 +16,9 @@ content-type: application/json
 {
   "name": "teste",
   "email":"teste@gmail.com",
-  "senha":"12345"
+  "senha":"12345",
+  "type":"userClient"
 }
-
 ### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
 GET https://projeto-integrador-fiado.onrender.com/user HTTP/1.1

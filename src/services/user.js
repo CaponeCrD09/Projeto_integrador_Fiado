@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import { attachSave } from "../utils/save.js";
+import jwt from 'jsonwebtoken';
 
 // req: requisição (o que está vindo do frontend)
 // res: response (o que eu vou enviar de volta)
@@ -10,6 +11,58 @@ import { attachSave } from "../utils/save.js";
 async function resolveUserType(userId) {
     const companyCount = await prisma.company.count({ where: { userId: userId } });
     return companyCount > 0 ? "userOwner" : "userClient";
+}
+
+// Login: autentica o usuário por email e senha, retorna um token JWT
+export async function loginUser(req, res, _next) {
+    try {
+        const { email, senha } = req.body;
+
+        if (!email || !senha) {
+            return res.status(400).json({ erro: "Email e senha são obrigatórios." });
+        }
+
+        const user = await prisma.user.findFirst({
+            where: { email },
+            include: { companies: true },
+        });
+
+        if (!user) {
+            return res.status(401).json({ erro: "Email ou senha inválidos." });
+        }
+
+        if (user.senha !== senha) {
+            return res.status(401).json({ erro: "Email ou senha inválidos." });
+        }
+
+        // Calcula o type dinamicamente
+        const type = user.companies && user.companies.length > 0 ? "userOwner" : "userClient";
+
+        const secret = process.env.JWT_SECRET || 'secret_key_default';
+
+        const token = jwt.sign(
+            {
+                sub: user.id,
+                name: user.name,
+                email: user.email,
+                type: type,
+            },
+            secret,
+            { expiresIn: '1d' }
+        );
+
+        return res.status(200).json({
+            usuario: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                type: type,
+            },
+            token,
+        });
+    } catch (error) {
+        return res.status(500).json({ erro: "Erro ao realizar login.", detalhe: error.message });
+    }
 }
 
 export async function createUser(req, res, _next) {

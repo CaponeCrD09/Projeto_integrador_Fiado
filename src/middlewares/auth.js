@@ -19,14 +19,22 @@ export const authMiddleware = (req, res, next) => {
     return res.status(401).json({ error: 'Token mal formatado' });
   }
 
-  const secret = process.env.JWT_SECRET || 'secret_key_default';
+  try {
+    const secret = process.env.JWT_SECRET || 'secret_key_default';
 
-  jwt.verify(token, secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token inválido' });
-    }
 
-    req.userId = decoded.id; 
+
+    const payload = jwt.verify(token, secret);
+
+    req.logeded = {
+      id: payload.sub,
+      name: payload.name,
+      email: payload.email,
+      type: payload.type
+    };
+
     return next();
-  });
+  } catch (e) {
+    return res.status(403).json({ error: 'Token inválido' });
+  }
 };
