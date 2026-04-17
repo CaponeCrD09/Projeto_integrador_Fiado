@@ -1,6 +1,25 @@
 
+<<<<<<< HEAD
 ### criando os companias
 POST http://localhost:3000/company HTTP/1.1
+=======
+# =============================================
+# VARIÁVEIS GLOBAIS
+# =============================================
+@baseUrl = http://localhost:3000
+@email   = flinho@gmail.com
+@senha   = 1234
+
+
+# =============================================
+# PASSO 1: Login — o token é capturado automaticamente
+# =============================================
+# Clique em "Send Request" no login abaixo.
+# A variável {{token}} será preenchida sozinha nas próximas.
+
+# @name login
+POST {{baseUrl}}/user/login HTTP/1.1
+>>>>>>> e1f8669f21856ddf4b3eba3d1979e22b2f29b893
 content-type: application/json
 
 {
