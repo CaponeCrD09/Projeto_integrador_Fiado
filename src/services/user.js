@@ -9,6 +9,8 @@ import jwt from 'jsonwebtoken';
 
 // Função auxiliar: determina o type do usuário com base na existência de empresas vinculadas
 async function resolveUserType(userId) {
+    const user = await prisma.user.findFirst({ where: { id: userId } });
+    if (user && user.type === "userADM") return "userADM";
     const companyCount = await prisma.company.count({ where: { userId: userId } });
     return companyCount > 0 ? "userOwner" : "userClient";
 }
@@ -35,8 +37,8 @@ export async function loginUser(req, res, _next) {
             return res.status(401).json({ erro: "Email ou senha inválidos." });
         }
 
-        // Calcula o type dinamicamente
-        const type = user.companies && user.companies.length > 0 ? "userOwner" : "userClient";
+        // Calcula o type dinamicamente preservando userADM
+        const type = user.type === "userADM" ? "userADM" : (user.companies && user.companies.length > 0 ? "userOwner" : "userClient");
 
         const secret = process.env.JWT_SECRET || 'secret_key_default';
 
@@ -67,7 +69,7 @@ export async function loginUser(req, res, _next) {
 
 export async function createUser(req, res, _next) {
     try {
-        const { name, email, senha } = req.body;
+        const { name, email, senha, type } = req.body;
 
         // Verifica se já existe um usuário com o mesmo email
         const emailExistente = await prisma.user.findFirst({ where: { email } });
@@ -75,14 +77,38 @@ export async function createUser(req, res, _next) {
             return res.status(409).json({ erro: "Este email já está cadastrado." });
         }
 
-        // O campo "type" NÃO é aceito do frontend — será calculado automaticamente
-        // O type é determinado pela relação: se o user já possui alguma Company vinculada → userOwner, senão → userClient
+        let finalType = "userClient";
 
-        // Cria o usuário com type = "userClient" por padrão (novo usuário nunca tem empresa vinculada ainda)
+        // Verifica se quem está criando é um userADM (passado pelo token via requisição)
+        const authHeader = req.headers.authorization;
+        if (authHeader) {
+            const parts = authHeader.split(' ');
+            if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
+                try {
+                    const secret = process.env.JWT_SECRET || 'secret_key_default';
+                    const payload = jwt.verify(parts[1], secret);
+                    if (payload.type === 'userADM' && type) {
+                        finalType = type; // Permite ao admin escolher o type do novo usuário
+                    }
+                } catch (e) {
+                    // Token inválido ou ausente, segue com a default "userClient"
+                }
+            }
+        }
+
+        // Permite criar o primeiro userADM caso o banco de dados de usuários esteja vazio
+        if (type === 'userADM' && finalType !== 'userADM') {
+            const userCount = await prisma.user.count();
+            if (userCount === 0) {
+                finalType = 'userADM';
+            }
+        }
+
+        // Cria o usuário
         let u = await prisma.user.create({
             data: {
                 name,
-                type: "userClient",
+                type: finalType,
                 email,
                 senha,
             },
@@ -108,10 +134,10 @@ export async function readUser(req, res, _next) {
             include: { companies: true },
         });
 
-        // Calcula o type dinamicamente para cada usuário baseado na relação com Company
+        // Calcula o type dinamicamente para cada usuário baseado na relação com Company, exceto os admins
         users = users.map((u) => ({
             ...u,
-            type: u.companies && u.companies.length > 0 ? "userOwner" : "userClient",
+            type: u.type === "userADM" ? "userADM" : (u.companies && u.companies.length > 0 ? "userOwner" : "userClient"),
         }));
 
         // Se o filtro de type foi passado na query, filtra após o cálculo dinâmico
@@ -141,8 +167,8 @@ export async function showUser(req, res, _next) {
             return res.status(404).json({ erro: "Não encontrei o usuário com ID " + id });
         }
 
-        // Calcula o type dinamicamente
-        u.type = u.companies && u.companies.length > 0 ? "userOwner" : "userClient";
+        // Calcula o type dinamicamente preservando userADM
+        u.type = u.type === "userADM" ? "userADM" : (u.companies && u.companies.length > 0 ? "userOwner" : "userClient");
 
         return res.status(200).json(u);
     } catch (error) {

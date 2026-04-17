@@ -16,14 +16,14 @@ content-type: application/json
 
 ### Listar todos os pagamentos
 
-GET http://localhost:3000/paymentHTTP/1.1
+GET http://localhost:3000/payment HTTP/1.1
 Authorization: Bearer {{userToken}}
 content-type: application/json
 
 
 ### mostrar
 
-GET https://projeto-integrador-fiado.onrender.com/payment/value_min?=10&value_max=60 HTTP/1.1
+GET http://localhost:3000/payment HTTP/1.1
 Authorization: Bearer {{userToken}}
 Content-type: application/json
 
