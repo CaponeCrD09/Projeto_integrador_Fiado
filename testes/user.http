@@ -6,6 +6,7 @@ content-type: application/json
 {
   "email":"teste@gmail.com",
   "senha":"12345"
+  ""
 }
 
 ### criando um usuario (type será automaticamente "userClient")
