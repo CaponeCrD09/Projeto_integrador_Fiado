@@ -1,53 +1,62 @@
+@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJGRUxJUEVfMiIsImVtYWlsIjoidGVzdGVAZ21haWwuY29tIiwidHlwZSI6InVzZXJDbGllbnQiLCJpYXQiOjE3NzY0NjQwNDIsImV4cCI6MTc3NjU1MDQ0Mn0.ltm7ZtUU2RIqGBtvNUCn6qq30Os3Fptg1GuUEa-34C8 
+
  ### criando os pagamentos
 POST http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
 content-type: application/json
 
 {
     "companyId":1,
-    "value":20.0,      
+    "value":10.0,      
     "method":"pix",  
-    "toDate":"2026-04-08T00:00:01.000Z",       
-    "dueDate":"2026-04-10T00:00:00.000Z",        
-    "userId":1
+    "toDate":"2026-04-18T00:00:01.000Z",       
+    "dueDate":"2026-04-19T00:00:00.000Z",        
+    "userId":2
 }
 
 ### Listar todos os pagamentos
 
-GET https://projeto-integrador-fiado.onrender.com/payment HTTP/1.1
+GET http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
 content-type: application/json
 
 
 ### mostrar
 
-GET https://projeto-integrador-fiado.onrender.com/payment/value_min?=10&value_max=60 HTTP/1.1
+GET http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 ### mostrar
 
 GET https://projeto-integrador-fiado.onrender.com/payment/ HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 ###
 GET https://projeto-integrador-fiado.onrender.com/payment/userId?=2 HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 ### 
 
 PUT  https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 {
     "companyId":1,
-    "value":200.0,      
+    "value":20.0,      
     "method":"boleto",  
-    "toDate":"2020-01-01T00:00:00.000Z",       
-    "dueDate":"2022-01-02T00:00:00.000Z",        
+    "toDate":"2026-04-017T00:00:00.000Z",       
+    "dueDate":"2022-04-18T00:00:00.000Z",        
     "userId":1
 }
 
 
 ###
 DELETE https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 
