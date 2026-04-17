@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { createProducts, readProducts, showProducts, editProducts, deleteProducts } from '../services/product.js';
+import { authMiddleware } from "../middlewares/auth.js";
 
 const router = Router();
 
