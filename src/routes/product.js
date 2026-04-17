@@ -12,5 +12,6 @@ router.get('/', readProducts);
 router.get('/:id', showProducts);
 router.put('/:id', authMiddleware, editProducts);
 router.delete('/:id', authMiddleware, deleteProducts);
+router.post('/login', authMiddleware, login);   
 
 export default router; 

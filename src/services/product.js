@@ -23,15 +23,18 @@ function hasIllegalProductData(data) {
 //res; response, ou seja, a resposta que o backend vai enviar para o frontend, onde eu posso enviar os dados que eu quero que o frontend receba, como por exemplo, os dados de um produto ou uma mensagem de erro
 //next; função para passar para o próximo middleware, caso haja algum erro ou algo do tipo, ele passa para o próximo middleware de tratamento de erros
 export async function createProducts(req, res, _next) {
+    try {
+        const data = req.body
 
-    const data = req.body
+        if (hasIllegalProductData(data)) {
+            return res.status(400).json({ error: "Não é permitido cadastrar produtos ilícitos." });
+        }
 
-    if (hasIllegalProductData(data)) {
-        return res.status(400).json({ error: "Não é permitido cadastrar produtos ilícitos." });
+        let p = await prisma.product.create({ data });
+        return res.status(201).json(p);
+    } catch (error) {
+        return res.status(500).json({ error: "Erro interno", detalhe: error.message });
     }
-
-    let p = await prisma.product.create({ data });
-    return res.status(201).json(p);
 }
 
 export async function readProducts(req, res, _next) {

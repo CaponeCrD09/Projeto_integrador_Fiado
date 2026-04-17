@@ -8,6 +8,8 @@ content-type: application/json
   "senha": "{{senha}}"
 }
 
+###
+
 @token = {{login.response.body.$.token}}
 
 ### Listar todos as companias.
@@ -37,12 +39,12 @@ Content-Type: application/json
 {
   "name":     "abracadabra",
   "category": "balas",
-  "cnpj":     "12345678000199",
+  "cnpj":     "1234520199",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
   "phone":    "190",
-  "userId":   1
+  "userId":   2
 }
 
 

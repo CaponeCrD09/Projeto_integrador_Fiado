@@ -21,10 +21,10 @@ POST http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "felipeadmin",
-  "email":"testeadm@gmail.com",
-  "senha":"12345",
-  "type":"userADM"
+  "name": "flinho",
+  "email":"flinho@gmail.com",
+  "senha":"1234",
+  "type":"userClient"
 }
 ### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
