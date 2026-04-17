@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { createCompany, readCompany, showCompany, updateCompany, deletCompany } from "../services/company.js";
 import upload from "../middlewares/upload.js";
-import { companyAuthMiddleware } from "../middlewares/companyAuth.js";
+import { authMiddleware } from "../middlewares/auth.js";
 
 const router = Router();
 
