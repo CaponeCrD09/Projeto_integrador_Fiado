@@ -17,10 +17,10 @@ POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "flinho",
-  "email":"flinho@gmail.com",
+  "name": "neres",
+  "email":"neres@gmail.com",
   "senha":"1234",
-  "type":"userClient"
+  "type":"admin"
 }
 ### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
