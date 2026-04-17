@@ -69,6 +69,12 @@ export async function createUser(req, res, _next) {
     try {
         const { name, email, senha } = req.body;
 
+        // Verifica se já existe um usuário com o mesmo email
+        const emailExistente = await prisma.user.findFirst({ where: { email } });
+        if (emailExistente) {
+            return res.status(409).json({ erro: "Este email já está cadastrado." });
+        }
+
         // O campo "type" NÃO é aceito do frontend — será calculado automaticamente
         // O type é determinado pela relação: se o user já possui alguma Company vinculada → userOwner, senão → userClient
 
@@ -157,6 +163,14 @@ export async function updateUser(req, res, _next) {
 
         if (!u) {
             return res.status(404).json({ erro: "Não encontrei o usuário com ID " + id });
+        }
+
+        // Verifica se o novo email já está sendo usado por outro usuário
+        if (email && email !== u.email) {
+            const emailExistente = await prisma.user.findFirst({ where: { email } });
+            if (emailExistente) {
+                return res.status(409).json({ erro: "Este email já está cadastrado." });
+            }
         }
 
         u = attachSave(u, 'user');
