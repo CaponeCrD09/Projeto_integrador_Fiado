@@ -15,7 +15,7 @@ app.use(cors()); //aqui falo qual os cors
 app.use(express.json()); // aqui quam fomato json
 
 app.use('/user', userRouter);
-app.use('/product', authMiddleware, productRouter);
+app.use('/product',  productRouter);
 app.use('/payment', authMiddleware, paymentRouter);
 app.use('/company', companyRouter);
 
