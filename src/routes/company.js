@@ -19,4 +19,4 @@ router.post('/', authMiddleware, blockUserClient, upload.single('logoFile'), cre
 router.put('/:id', authMiddleware, requireOwnership, upload.single('logoFile'), updateCompany);
 router.delete('/:id', authMiddleware, requireOwnership, deletCompany);
 
-export default router;
+export default router;

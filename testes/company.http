@@ -3,7 +3,7 @@
 # VARIÁVEIS GLOBAIS
 # =============================================
 @baseUrl = https://projeto-integrador-fiado.onrender.com
-@email   = flinho@gmail.co
+@email   = mi@gmail.com
 @senha   = 1234
 
 

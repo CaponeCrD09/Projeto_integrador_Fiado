@@ -18,9 +18,9 @@ content-type: application/json
 
 {
   "name": "flinho",
-  "email":"flinho@gmail.com",
+  "email":"mi@gmail.com",
   "senha":"1234",
-  "type":"userClient"
+  "type":"admin"
 }
 ### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
