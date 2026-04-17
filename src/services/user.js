@@ -122,6 +122,11 @@ export async function createUser(req, res, _next) {
 
 export async function readUser(req, res, _next) {
     try {
+        // Bloqueio RBAC: Apenas admin pode listar usuários
+        if (!req.logeded || req.logeded.type !== 'admin') {
+            return res.status(403).json({ erro: "Acesso Negado: Apenas administradores podem listar todos os usuários." });
+        }
+
         const { name, type, email } = req.query;
         let consult = {};
 
@@ -158,6 +163,11 @@ export async function showUser(req, res, _next) {
             return res.status(400).json({ erro: "ID deve ser um número válido." });
         }
 
+        // Bloqueio RBAC: Usuário comum apenas vê o próprio perfil
+        if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== id)) {
+            return res.status(403).json({ erro: "Acesso Negado: Você só tem permissão para visualizar o próprio perfil." });
+        }
+
         let u = await prisma.user.findFirst({
             where: { id: id },
             include: { companies: true },
@@ -181,6 +191,11 @@ export async function updateUser(req, res, _next) {
         let id = Number(req.params.id);
         if (isNaN(id)) {
             return res.status(400).json({ erro: "ID deve ser um número válido." });
+        }
+
+        // Bloqueio RBAC: Usuário comum apenas edita o próprio perfil
+        if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== id)) {
+            return res.status(403).json({ erro: "Acesso Negado: Você só tem permissão para editar o próprio perfil." });
         }
 
         // O campo "type" não é aceito do frontend para evitar manipulação manual de role
@@ -221,6 +236,11 @@ export async function deletando(req, res, _next) {
         let id = Number(req.params.id);
         if (isNaN(id)) {
             return res.status(400).json({ erro: "ID deve ser um número válido." });
+        }
+
+        // Bloqueio RBAC: Usuário comum apenas deleta o próprio perfil
+        if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== id)) {
+            return res.status(403).json({ erro: "Acesso Negado: Você só tem permissão para deletar o próprio perfil." });
         }
 
         const u = await prisma.user.findFirst({ where: { id: id } });

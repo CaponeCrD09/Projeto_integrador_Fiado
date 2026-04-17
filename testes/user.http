@@ -1,15 +1,19 @@
-
-
-
+@emailLogin = milena@gmail.com
+@senhaLogin = 12345
+### Salva o Token Globalmente (Automático)
+@authToken = {{realizarLogin.response.body.token}}
 
 ### Login do usuário (retorna token JWT)
+# @name realizarLogin
+
 POST http://localhost:3000/user/login HTTP/1.1
 content-type: application/json
 
 {
-  "email":"testeadm@gmail.com",
-  "senha":"12345"
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
 }
+
 
 ### criando um usuario (type será automaticamente "userClient")
 ### O campo "type" NÃO precisa ser enviado — o sistema calcula sozinho
@@ -17,7 +21,7 @@ POST http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 {
-  "name": "superADM",
+  "name": "felipeadmin",
   "email":"testeadm@gmail.com",
   "senha":"12345",
   "type":"userADM"

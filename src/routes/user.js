@@ -1,17 +1,16 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { createUser, readUser, showUser, updateUser, deletando, loginUser } from '../services/user.js';
-
-//import { authMiddleware } from "../middlewares/auth.js";
+import { authMiddleware } from "../middlewares/auth.js";
 const router = Router();
 // const zod = z();
 
 router.post('/login', loginUser);
 router.post('/', createUser);
-router.get('/', readUser)
-router.get('/:id', showUser);
-router.put('/:id', updateUser);
-router.delete('/:id', deletando)
+router.get('/', authMiddleware, readUser);
+router.get('/:id', authMiddleware, showUser);
+router.put('/:id', authMiddleware, updateUser);
+router.delete('/:id', authMiddleware, deletando);
 
 
 
