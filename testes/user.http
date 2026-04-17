@@ -1,55 +1,64 @@
-
-
-
+@emailLogin = milena@gmail.com
+@senhaLogin = 12345
+### Salva o Token Globalmente (Automático)
+@authToken = {{realizarLogin.response.body.token}}
 
 ### Login do usuário (retorna token JWT)
-POST https://projeto-integrador-fiado.onrender.com/user/login HTTP/1.1
+# @name realizarLogin
+
+POST http://localhost:3000/user/login HTTP/1.1
 content-type: application/json
 
 {
-  "email":"testeadm@gmail.com",
-  "senha":"12345"
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
 }
+
 
 ### criando um usuario (type será automaticamente "userClient")
 ### O campo "type" NÃO precisa ser enviado — o sistema calcula sozinho
-POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
+POST http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 {
+<<<<<<< HEAD
   "name": "flinho",
   "email":"mi@gmail.com",
+=======
+  "name": "neres",
+  "email":"neres@gmail.com",
+>>>>>>> 75fa755e24606724623a5b7bce203169aa94aa37
   "senha":"1234",
   "type":"admin"
 }
 ### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
-GET https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
+GET http://localhost:3000/user HTTP/1.1
 content-type: application/json
 
 ### Listar apenas userOwner (usuários que possuem empresa vinculada)
 
-GET https://projeto-integrador-fiado.onrender.com/user?type=userOwner HTTP/1.1
+GET http://localhost:3000/user?type=userOwner HTTP/1.1
 content-type: application/json
 
 ### Listar apenas userClient (usuários sem empresa vinculada)
 
-GET https://projeto-integrador-fiado.onrender.com/user?type=userClient HTTP/1.1
+GET http://localhost:3000/user?type=userClient HTTP/1.1
 content-type: application/json
 
 ### buscar apenas um usuario (type dinâmico + empresas vinculadas incluídas)
 
-GET https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
+GET http://localhost:3000/user/1 HTTP/1.1
 content-type: application/json
 
 ### buscar por nome
 
-GET https://projeto-integrador-fiado.onrender.com/user?name=teste HTTP/1.1
+GET http://localhost:3000/user?name=teste HTTP/1.1
 content-type: application/json
 
 ### edita user (type NÃO pode ser alterado manualmente — é recalculado)
 
-PUT https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
+PUT http://localhost:3000/user/1 HTTP/1.1
 content-type: application/json
 
 {
@@ -59,5 +68,5 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE  https://projeto-integrador-fiado.onrender.com/user/6 HTTP/1.1
+DELETE  http://localhost:3000/user/6 HTTP/1.1
 content-type: application/json

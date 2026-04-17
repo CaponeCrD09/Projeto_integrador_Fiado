@@ -14,10 +14,10 @@ async function main() {
 
     const updatedUser = await prisma.user.update({
         where: { id: user.id },
-        data: { type: "userADM" }
+        data: { type: "admin" }
     });
 
-    console.log(`Sucesso! O usuário '${updatedUser.name}' (ID: ${updatedUser.id}) agora é um userADM.`);
+    console.log(`Sucesso! O usuário '${updatedUser.name}' (ID: ${updatedUser.id}) agora é um admin.`);
 }
 
 main()
