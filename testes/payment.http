@@ -1,17 +1,13 @@
-@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJGRUxJUEVfMiIsImVtYWlsIjoidGVzdGVAZ21haWwuY29tIiwidHlwZSI6InVzZXJDbGllbnQiLCJpYXQiOjE3NzY0NjQwNDIsImV4cCI6MTc3NjU1MDQ0Mn0.ltm7ZtUU2RIqGBtvNUCn6qq30Os3Fptg1GuUEa-34C8 
-
- ### criando os pagamentos
-POST http://localhost:3000/payment HTTP/1.1
+@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJGRUxJUEVfMiIsImVtYWlsIjoidGVzdGVAZ21haWwuY29tIiwidHlwZSI6InVzZXJDbGllbnQiLCJpYXQiOjE3NzY0NjQwNDIsImV4cCI6MTc3NjU1MDQ0Mn0.ltm7ZtUU2RIqGBtvNUCn6qq30Os3Fptg1GuUEa-34C8POST http://localhost:3000/payment HTTP/1.1
 Authorization: Bearer {{userToken}}
 content-type: application/json
 
 {
-    "companyId":1,
-    "value":10.0,      
+    "companyId":2,
+    "value":20.0,      
     "method":"pix",  
     "toDate":"2026-04-18T00:00:01.000Z",       
-    "dueDate":"2026-04-19T00:00:00.000Z",        
-    "userId":2
+    "dueDate":"2026-04-19T00:00:00.000Z"
 }
 
 ### Listar todos os pagamentos
@@ -60,3 +56,80 @@ Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 
+###############################################
+### TESTES DE TOKEN DE OUTRO USUARIO (DEVEM FALHAR COM 403)
+### Mensagem esperada: "Este token é invalido ou pertence a outro usuário."
+###############################################
+
+### ERRO: Criar pagamento com userId diferente do token
+### O token é do usuario 1 (sub:1), mas userId no body é 2
+### Deve retornar 403: "Este token é invalido ou pertence a outro usuário."
+
+POST http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
+content-type: application/json
+
+{
+    "companyId":1,
+    "value":10.0,      
+    "method":"pix",  
+    "toDate":"2026-04-18T00:00:01.000Z",       
+    "dueDate":"2026-04-19T00:00:00.000Z",        
+    "userId":99
+}
+
+### ERRO: Ver pagamento que pertence a outro usuario
+### Deve retornar 403 se o pagamento não pertence ao usuario do token
+
+GET https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
+Content-type: application/json
+
+### ERRO: Editar pagamento que pertence a outro usuario
+### Deve retornar 403 se o pagamento não pertence ao usuario do token
+
+PUT https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
+Content-type: application/json
+
+{
+    "value": 50.0
+}
+
+### ERRO: Deletar pagamento que pertence a outro usuario
+### Deve retornar 403 se o pagamento não pertence ao usuario do token
+
+DELETE https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
+Content-type: application/json
+
+###############################################
+### TESTES DE EMPRESA DE OUTRO USUARIO (DEVEM FALHAR COM 403)
+### Mensagem esperada: "Esta empresa não pertence ao seu usuário."
+###############################################
+
+### ERRO: Criar pagamento usando empresa de outro usuario
+### Se a empresa com companyId não pertence ao usuario do token, retorna 403
+
+POST http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
+content-type: application/json
+
+{
+    "companyId":999,
+    "value":10.0,      
+    "method":"pix",  
+    "toDate":"2026-04-18T00:00:01.000Z",       
+    "dueDate":"2026-04-19T00:00:00.000Z"
+}
+
+### ERRO: Editar pagamento trocando para empresa de outro usuario
+### Deve retornar 403 se a nova companyId não pertence ao usuario do token
+
+PUT https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
+Content-type: application/json
+
+{
+    "companyId": 999
+}

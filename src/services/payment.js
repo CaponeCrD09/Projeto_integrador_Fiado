@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { z }            from "zod";
-import { attachSave }   from "../utils/save.js";
+import { z } from "zod";
+import { attachSave } from "../utils/save.js";
 
 const prisma = new PrismaClient();
 
@@ -22,7 +22,7 @@ const METODOS_PERMITIDOS = ["boleto", "dinheiro físico", "pix", "cartão"];
  */
 const idSchema = z.coerce
     .number({ invalid_type_error: "O ID deve ser um número." })
-    .int(  { message: "O ID deve ser um número inteiro." })
+    .int({ message: "O ID deve ser um número inteiro." })
     .positive({ message: "O ID deve ser maior que zero." });
 
 /**
@@ -43,18 +43,13 @@ const paymentFields = z.object({
 
     companyId: z
         .number({ invalid_type_error: "O campo 'companyId' deve ser um número inteiro (ex: 1, 2, 3)." })
-        .int(      { message: "O campo 'companyId' deve ser um número inteiro, sem decimais." })
-        .positive( { message: "O campo 'companyId' deve ser maior que zero." }),
-
-    userId: z
-        .number({ invalid_type_error: "O campo 'userId' deve ser um número inteiro (ex: 1, 2, 3)." })
-        .int(      { message: "O campo 'userId' deve ser um número inteiro, sem decimais." })
-        .positive( { message: "O campo 'userId' deve ser maior que zero." }),
+        .int({ message: "O campo 'companyId' deve ser um número inteiro, sem decimais." })
+        .positive({ message: "O campo 'companyId' deve ser maior que zero." }),
 
     value: z
         .number({ invalid_type_error: "O campo 'value' deve ser um número decimal (ex: 150.00)." })
         .nonnegative({ message: "O valor do pagamento não pode ser negativo." })
-        .max(10000,  { message: "O valor do pagamento não pode ser maior que R$ 10.000,00." }),
+        .max(10000, { message: "O valor do pagamento não pode ser maior que R$ 10.000,00." }),
 
     method: z
         .string({ invalid_type_error: "O campo 'method' deve ser uma string de texto." })
@@ -76,20 +71,20 @@ const paymentFields = z.object({
 });
 
 const paymentBaseSchema = paymentFields
-// Validação cruzada 1: dueDate não pode ser anterior a toDate
-.refine(
-    ({ toDate, dueDate }) => new Date(dueDate) >= new Date(toDate),
-    { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
-)
-// Validação cruzada 2: dueDate deve estar dentro do limite de 3 meses
-.refine(
-    ({ toDate, dueDate }) => {
-        const limite = new Date(toDate);
-        limite.setMonth(limite.getMonth() + 3);
-        return new Date(dueDate) <= limite;
-    },
-    { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
-);
+    // Validação cruzada 1: dueDate não pode ser anterior a toDate
+    .refine(
+        ({ toDate, dueDate }) => new Date(dueDate) >= new Date(toDate),
+        { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
+    )
+    // Validação cruzada 2: dueDate deve estar dentro do limite de 3 meses
+    .refine(
+        ({ toDate, dueDate }) => {
+            const limite = new Date(toDate);
+            limite.setMonth(limite.getMonth() + 3);
+            return new Date(dueDate) <= limite;
+        },
+        { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
+    );
 
 /**
  * Schema para criação (POST) — todos os campos são obrigatórios.
@@ -103,26 +98,26 @@ const createSchema = paymentBaseSchema;
  * As validações cruzadas de datas só se aplicam se ambos os campos estiverem presentes.
  */
 const updateSchema = paymentFields.partial()
-.refine(
-    (data) => {
-        if (data.toDate && data.dueDate) {
-            return new Date(data.dueDate) >= new Date(data.toDate);
-        }
-        return true;
-    },
-    { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
-)
-.refine(
-    (data) => {
-        if (data.toDate && data.dueDate) {
-            const limite = new Date(data.toDate);
-            limite.setMonth(limite.getMonth() + 3);
-            return new Date(data.dueDate) <= limite;
-        }
-        return true;
-    },
-    { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
-);
+    .refine(
+        (data) => {
+            if (data.toDate && data.dueDate) {
+                return new Date(data.dueDate) >= new Date(data.toDate);
+            }
+            return true;
+        },
+        { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
+    )
+    .refine(
+        (data) => {
+            if (data.toDate && data.dueDate) {
+                const limite = new Date(data.toDate);
+                limite.setMonth(limite.getMonth() + 3);
+                return new Date(data.dueDate) <= limite;
+            }
+            return true;
+        },
+        { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
+    );
 
 /**
  * Schema de query param para busca (GET /payment?value=X).
@@ -190,13 +185,21 @@ export async function createPayment(req, res, _next) {
     const data = validate(createSchema, req.body, res);
     if (!data) return;
 
-    // 2. Verifica se userId existe no banco
+    // 2. Usa o userId do token autenticado (não vem mais do body)
+    data.userId = req.logeded.id;
+
+    // 3. Verifica se userId existe no banco
     const user = await prisma.user.findFirst({ where: { id: data.userId } });
     if (!user) return res.status(404).json({ error: `Usuário com ID ${data.userId} não encontrado.` });
 
-    // 3. Verifica se companyId existe no banco
+    // 4. Verifica se companyId existe no banco
     const company = await prisma.company.findFirst({ where: { id: data.companyId } });
     if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
+
+    // 5. Verifica se a empresa pertence ao usuário logado (ADM pode usar qualquer empresa)
+    if (req.logeded.type !== 'userADM' && company.userId !== req.logeded.id) {
+        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    }
 
     const u = await prisma.payment.create({ data });
     return res.status(201).json(u);
@@ -211,7 +214,15 @@ export async function readPayment(req, res, _next) {
     const query = validate(querySchema, req.query, res);
     if (!query) return;
 
-    const where = query.value !== undefined ? { value: query.value } : {};
+    // Monta o filtro base — usuários comuns só veem seus próprios pagamentos
+    const where = {};
+    if (req.logeded && req.logeded.type !== 'userADM') {
+        where.userId = req.logeded.id;
+    }
+    if (query.value !== undefined) {
+        where.value = query.value;
+    }
+
     const payments = await prisma.payment.findMany({ where });
     return res.status(200).json(payments);
 }
@@ -227,6 +238,17 @@ export async function showPayment(req, res, _next) {
 
     const p = await findPaymentOrFail(id, res);
     if (!p) return;
+
+    // Verifica se o token pertence ao usuário dono do pagamento
+    if (req.logeded && req.logeded.type !== 'userADM' && req.logeded.id !== p.userId) {
+        return res.status(403).json({ erro: "Este token é invalido ou pertence a outro usuário." });
+    }
+
+    // Verifica se a empresa do pagamento pertence ao usuário logado
+    const company = await prisma.company.findFirst({ where: { id: p.companyId } });
+    if (req.logeded && req.logeded.type !== 'userADM' && company && company.userId !== req.logeded.id) {
+        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    }
 
     return res.status(200).json(p);
 }
@@ -246,23 +268,37 @@ export async function updatePayment(req, res, _next) {
     let p = await findPaymentOrFail(id, res);
     if (!p) return;
 
-    // 3. Valida os campos do body (schema parcial — tudo opcional)
+    // 3. Verifica se o token pertence ao usuário dono do pagamento (ADM pode editar qualquer um)
+    if (req.logeded && req.logeded.type !== 'userADM' && req.logeded.id !== p.userId) {
+        return res.status(403).json({ erro: "Este token é invalido ou pertence a outro usuário." });
+    }
+
+    // 4. Verifica se a empresa do pagamento pertence ao usuário logado
+    const companyAtual = await prisma.company.findFirst({ where: { id: p.companyId } });
+    if (req.logeded && req.logeded.type !== 'userADM' && companyAtual && companyAtual.userId !== req.logeded.id) {
+        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    }
+
+    // 5. Valida os campos do body (schema parcial — tudo opcional)
     const data = validate(updateSchema, req.body, res);
     if (!data) return;
 
-    // 4. Se userId foi enviado, verifica existência
+    // 6. Se companyId foi enviado, verifica existência e propriedade
+    if (data.companyId !== undefined) {
+        const company = await prisma.company.findFirst({ where: { id: data.companyId } });
+        if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
+        if (req.logeded && req.logeded.type !== 'userADM' && company.userId !== req.logeded.id) {
+            return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+        }
+    }
+
+    // 7. Se userId foi enviado, verifica existência
     if (data.userId !== undefined) {
         const user = await prisma.user.findFirst({ where: { id: data.userId } });
         if (!user) return res.status(404).json({ error: `Usuário com ID ${data.userId} não encontrado.` });
     }
 
-    // 5. Se companyId foi enviado, verifica existência
-    if (data.companyId !== undefined) {
-        const company = await prisma.company.findFirst({ where: { id: data.companyId } });
-        if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
-    }
-
-    // 6. Aplica apenas os campos presentes no body
+    // 8. Aplica apenas os campos presentes no body
     p = attachSave(p, "payment");
     Object.assign(p, data);
     await p.save();
@@ -281,6 +317,17 @@ export async function deletePayment(req, res, _next) {
 
     const d = await findPaymentOrFail(id, res);
     if (!d) return;
+
+    // Verifica se o token pertence ao usuário dono do pagamento (ADM pode deletar qualquer um)
+    if (req.logeded && req.logeded.type !== 'userADM' && req.logeded.id !== d.userId) {
+        return res.status(403).json({ erro: "Este token é invalido ou pertence a outro usuário." });
+    }
+
+    // Verifica se a empresa do pagamento pertence ao usuário logado
+    const company = await prisma.company.findFirst({ where: { id: d.companyId } });
+    if (req.logeded && req.logeded.type !== 'userADM' && company && company.userId !== req.logeded.id) {
+        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    }
 
     await prisma.payment.delete({ where: { id } });
     return res.status(200).json({ message: "Pagamento apagado com sucesso." });
