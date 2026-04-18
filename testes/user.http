@@ -1,9 +1,10 @@
+@baseUrl = {{baseUrl}}
 @emailLogin = superowner@gmail.com
 @senhaLogin = 1234
 
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
 # @name realizarLogin
-POST http://localhost:3000/user/login HTTP/1.1
+POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
 {
@@ -20,7 +21,7 @@ content-type: application/json
 # =========================================================
 
 ### criando um usuario admin (Apenas se o token logado for admin)
-POST http://localhost:3000/user HTTP/1.1
+POST {{baseUrl}}/user HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
@@ -37,32 +38,32 @@ content-type: application/json
 # =========================================================
 
 ### Listar todos os usuarios (Bloqueado para usuários comuns)
-GET http://localhost:3000/user HTTP/1.1
+GET {{baseUrl}}/user HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### Listar apenas userOwner (usuários que possuem empresa vinculada)
-GET http://localhost:3000/user?type=userOwner HTTP/1.1
+GET {{baseUrl}}/user?type=userOwner HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### Listar apenas userClient (usuários sem empresa vinculada)
-GET http://localhost:3000/user?type=userClient HTTP/1.1
+GET {{baseUrl}}/user?type=userClient HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### buscar apenas um usuario (Qualquer um acessa SEU próprio perfil, admin acessa todos)
-GET http://localhost:3000/user/1 HTTP/1.1
+GET {{baseUrl}}/user/1 HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### buscar por nome
-GET http://localhost:3000/user?name=teste HTTP/1.1
+GET {{baseUrl}}/user?name=teste HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### edita user (NÃO MUDAR TYPE AQUI, APENAS NA CRIAÇÃO)
-PUT http://localhost:3000/user/1 HTTP/1.1
+PUT {{baseUrl}}/user/1 HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
 
@@ -73,6 +74,8 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE http://localhost:3000/user/6 HTTP/1.1
+DELETE {{baseUrl}}/user/6 HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
+
+
