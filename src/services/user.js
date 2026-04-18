@@ -71,7 +71,46 @@ export async function createUser(req, res, _next) {
             return res.status(409).json({ erro: "Este email já está cadastrado." });
         }
 
-        let finalType = type || "userClient"; // Se não enviar nada, salva como userClient por padrão
+        let finalType = "userClient";
+        let loggedUserType = null;
+        const authHeader = req.headers.authorization;
+
+        // 1. Extração manual do JWT para verificar a role do criador
+        if (authHeader) {
+            const parts = authHeader.split(' ');
+            if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
+                try {
+                    const secret = process.env.JWT_SECRET || 'secret_key_default';
+                    const payload = jwt.verify(parts[1], secret);
+                    loggedUserType = payload.type;
+                } catch (e) {
+                    // Token inválido: segue como não autenticado
+                }
+            }
+        }
+
+        // 2. Aplicação da Hierarquia
+        if (loggedUserType === 'admin') {
+            // Regra do Admin: Pode criar qualquer um
+            finalType = type || "userClient";
+        } else if (loggedUserType === 'userOwner') {
+            // Regra do Owner: Apenas criar Clients. Bloqueia ativamente tentativas de criar Admin/Owner
+            if (type && type !== 'userClient') {
+                return res.status(403).json({ erro: "Acesso Negado: Proprietários só têm permissão para cadastrar Clientes (userClient)." });
+            }
+            finalType = "userClient";
+        } else {
+            // Regra Pública/Cliente: Força a criação padrão e ignora tentativas maliciosas
+            finalType = "userClient";
+        }
+
+        // Feature de proteção: Permite criar o primeiro admin caso o banco esteja inteiramente recém-limpo 
+        if (type === 'admin' && finalType !== 'admin') {
+            const userCount = await prisma.user.count();
+            if (userCount === 0) {
+                finalType = 'admin';
+            }
+        }
 
         // Cria o usuário
         let u = await prisma.user.create({

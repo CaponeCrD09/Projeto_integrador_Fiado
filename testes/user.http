@@ -1,4 +1,4 @@
-@emailLogin = felipe_admin@gmail.com
+@emailLogin = superowner@gmail.com
 @senhaLogin = 1234
 
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
@@ -25,10 +25,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "Neo client ",
-  "email":"neoclient2@gmail.com",
+  "name": "superowner",
+  "email":"superowner@gmail.com",
   "senha":"1234",
-  "type":"userClient"
+  "type":"userOwner"
 }
 
 
