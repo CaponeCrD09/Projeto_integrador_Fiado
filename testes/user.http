@@ -1,11 +1,8 @@
-@emailLogin = milena@gmail.com
-@senhaLogin = 12345
-### Salva o Token Globalmente (Automático)
-@authToken = {{realizarLogin.response.body.token}}
+@emailLogin = felipe_admin@gmail.com
+@senhaLogin = 1234
 
-### Login do usuário (retorna token JWT)
+### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
 # @name realizarLogin
-
 POST http://localhost:3000/user/login HTTP/1.1
 content-type: application/json
 
@@ -14,51 +11,59 @@ content-type: application/json
   "senha": "{{senhaLogin}}"
 }
 
+### Salva o Token Globalmente
+@authToken = {{realizarLogin.response.body.token}}
 
-### criando um usuario (type será automaticamente "userClient")
-### O campo "type" NÃO precisa ser enviado — o sistema calcula sozinho
+
+# =========================================================
+# CRIAR NOVO USUÁRIO (Requer Autenticação se for criar Admin)
+# =========================================================
+
+### criando um usuario admin (Apenas se o token logado for admin)
 POST http://localhost:3000/user HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-<<<<<<< HEAD
-  "name": "flinho",
-  "email":"mi@gmail.com",
-=======
-  "name": "neres",
-  "email":"neres@gmail.com",
->>>>>>> 75fa755e24606724623a5b7bce203169aa94aa37
+  "name": "Neo client ",
+  "email":"neoclient2@gmail.com",
   "senha":"1234",
-  "type":"admin"
+  "type":"userClient"
 }
-### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
+
+# =========================================================
+# ROTAS PROTEGIDAS (Ver, Editar, Deletar)
+# =========================================================
+
+### Listar todos os usuarios (Bloqueado para usuários comuns)
 GET http://localhost:3000/user HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### Listar apenas userOwner (usuários que possuem empresa vinculada)
-
 GET http://localhost:3000/user?type=userOwner HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### Listar apenas userClient (usuários sem empresa vinculada)
-
 GET http://localhost:3000/user?type=userClient HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
-### buscar apenas um usuario (type dinâmico + empresas vinculadas incluídas)
-
+### buscar apenas um usuario (Qualquer um acessa SEU próprio perfil, admin acessa todos)
 GET http://localhost:3000/user/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### buscar por nome
-
 GET http://localhost:3000/user?name=teste HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
-### edita user (type NÃO pode ser alterado manualmente — é recalculado)
-
+### edita user (NÃO MUDAR TYPE AQUI, APENAS NA CRIAÇÃO)
 PUT http://localhost:3000/user/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
@@ -68,5 +73,6 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE  http://localhost:3000/user/6 HTTP/1.1
+DELETE http://localhost:3000/user/6 HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json

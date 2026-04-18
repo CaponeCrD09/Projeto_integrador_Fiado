@@ -7,13 +7,7 @@ import jwt from 'jsonwebtoken';
 // res: response (o que eu vou enviar de volta)
 // next: proximo (o que eu vou fazer a seguir)
 
-// Função auxiliar: determina o type do usuário com base na existência de empresas vinculadas
-async function resolveUserType(userId) {
-    const user = await prisma.user.findFirst({ where: { id: userId } });
-    if (user && user.type === "admin") return "admin";
-    const companyCount = await prisma.company.count({ where: { userId: userId } });
-    return companyCount > 0 ? "userOwner" : "userClient";
-}
+// Lógica de type dinâmico foi removida por solicitação.
 
 // Login: autentica o usuário por email e senha, retorna um token JWT
 export async function loginUser(req, res, _next) {
@@ -37,8 +31,8 @@ export async function loginUser(req, res, _next) {
             return res.status(401).json({ erro: "Email ou senha inválidos." });
         }
 
-        // Calcula o type dinamicamente preservando admin
-        const type = user.type === "admin" ? "admin" : (user.companies && user.companies.length > 0 ? "userOwner" : "userClient");
+        // Usa diretamente o type do banco de dados
+        const type = user.type;
 
         const secret = process.env.JWT_SECRET || 'secret_key_default';
 
@@ -77,32 +71,7 @@ export async function createUser(req, res, _next) {
             return res.status(409).json({ erro: "Este email já está cadastrado." });
         }
 
-        let finalType = "userClient";
-
-        // Verifica se quem está criando é um admin (passado pelo token via requisição)
-        const authHeader = req.headers.authorization;
-        if (authHeader) {
-            const parts = authHeader.split(' ');
-            if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
-                try {
-                    const secret = process.env.JWT_SECRET || 'secret_key_default';
-                    const payload = jwt.verify(parts[1], secret);
-                    if (payload.type === 'admin' && type) {
-                        finalType = type; // Permite ao admin escolher o type do novo usuário
-                    }
-                } catch (e) {
-                    // Token inválido ou ausente, segue com a default "userClient"
-                }
-            }
-        }
-
-        // Permite criar o primeiro admin caso o banco de dados de usuários esteja vazio
-        if (type === 'admin' && finalType !== 'admin') {
-            const userCount = await prisma.user.count();
-            if (userCount === 0) {
-                finalType = 'admin';
-            }
-        }
+        let finalType = type || "userClient"; // Se não enviar nada, salva como userClient por padrão
 
         // Cria o usuário
         let u = await prisma.user.create({
@@ -139,11 +108,7 @@ export async function readUser(req, res, _next) {
             include: { companies: true },
         });
 
-        // Calcula o type dinamicamente para cada usuário baseado na relação com Company, exceto os admins
-        users = users.map((u) => ({
-            ...u,
-            type: u.type === "admin" ? "admin" : (u.companies && u.companies.length > 0 ? "userOwner" : "userClient"),
-        }));
+        // (A lógica de type dinâmico para userOwner e userClient foi removida)
 
         // Se o filtro de type foi passado na query, filtra após o cálculo dinâmico
         if (type) {
@@ -177,8 +142,7 @@ export async function showUser(req, res, _next) {
             return res.status(404).json({ erro: "Não encontrei o usuário com ID " + id });
         }
 
-        // Calcula o type dinamicamente preservando admin
-        u.type = u.type === "admin" ? "admin" : (u.companies && u.companies.length > 0 ? "userOwner" : "userClient");
+        // (A lógica de type dinâmico para userOwner e userClient foi removida)
 
         return res.status(200).json(u);
     } catch (error) {
@@ -220,8 +184,7 @@ export async function updateUser(req, res, _next) {
         if (email) u.email = email;
         if (senha) u.senha = senha;
 
-        // Recalcula o type após salvar, refletindo o estado real do banco
-        u.type = await resolveUserType(id);
+        // (A lógica de rescálculo dinâmico foi removida)
 
         await u.save();
 
