@@ -1,19 +1,22 @@
+@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsIm5hbWUiOiJzdXBlcm93bmVyIiwiZW1haWwiOiJzdXBlcm93bmVyQGdtYWlsLmNvbSIsInR5cGUiOiJ1c2VyQ2xpZW50IiwiaWF0IjoxNzc2NDczMTM0LCJleHAiOjE3NzY1NTk1MzR9.nKg2omXwb3WmMG5YMcGEjxz7oa9alfzQ5WrQyHMbWfI
+
 ### criando os produtos
 POST http://localhost:3000/product HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer {{userToken}}
 
 {
-    "email": "teste@gmail.com",
-    "senha": "12345"
+    "email": "superowner@gmail.com",
+    "senha": "1234"
 }
 
 ###
-@token = {{loginRequest.response.body.token}}
+
 
 ### criando os produtos
 POST https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{userToken}}
 
 {
   "companyId":1,
