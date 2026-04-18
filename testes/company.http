@@ -1,21 +1,30 @@
 
+<<<<<<< HEAD
+### criando os companias
+POST http://localhost:3000/company HTTP/1.1
+=======
 # =============================================
 # VARIÁVEIS GLOBAIS
 # =============================================
+<<<<<<< HEAD
 @baseUrl = https://projeto-integrador-fiado.onrender.com
-@email   = teste@gmail.com
-@senha   = 12345
+@email   = mi@gmail.com
+=======
+@baseUrl = http://localhost:3000
+@email   = flinho@gmail.com
+>>>>>>> 75fa755e24606724623a5b7bce203169aa94aa37
+@senha   = 1234
 
 
 # =============================================
 # PASSO 1: Login — o token é capturado automaticamente
 # =============================================
-# Clique em "Send Request" nesta requisição.
+# Clique em "Send Request" no login abaixo.
 # A variável {{token}} será preenchida sozinha nas próximas.
 
 # @name login
-### Login (execute primeiro!)
 POST {{baseUrl}}/user/login HTTP/1.1
+>>>>>>> e1f8669f21856ddf4b3eba3d1979e22b2f29b893
 content-type: application/json
 
 {
@@ -23,22 +32,38 @@ content-type: application/json
   "senha": "{{senha}}"
 }
 
+###
+
 @token = {{login.response.body.$.token}}
 
-
-# =============================================
-# PASSO 2: Rotas protegidas (token automático)
-# =============================================
-
-### Criar company
-POST {{baseUrl}}/company HTTP/1.1
+### Listar todos as companias.
+GET http://localhost:3000/company HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
+
+
+### busca apens uma compania
+GET http://localhost:3000/company/2 HTTP/1.1
+content-type: application/json
+
+### BUSCAR POR NOME
+
+GET http://localhost:3000/company?name=abrobrinha HTTP/1.1
+content-type: application/json
+
+### BUSCAR POR TYPE
+
+GET http://localhost:3000/company?type=bo HTTP/1.1
+content-type: application/json
+
+### ATUALIZANDO HAHA
+
+PUT http://localhost:3000/company/1 HTTP/1.1
+Content-Type: application/json
 
 {
   "name":     "abracadabra",
   "category": "balas",
-  "cnpj":     "12345678000199",
+  "cnpj":     "1234520199",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",

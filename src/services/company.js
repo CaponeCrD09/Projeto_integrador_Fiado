@@ -5,13 +5,13 @@ import { attachSave } from "../utils/save.js";
 import { uploadToImgBB } from "../utils/imgbb.js";
 
 
-        //req: quequisição o que esta vindo do frontend
-        //res: responder ooque vou responder
-        //next: proximo o que fazer a seguir
+//req: quequisição o que esta vindo do frontend
+//res: responder ooque vou responder
+//next: proximo o que fazer a seguir
 
-    export async function createCompany(req, res, _next){
+export async function createCompany(req, res, _next) {
     const data = req.body;
-    
+
     // Regra/Exceção: Não permitir cadastro de CNPJ duplicado
     if (data.cnpj) {
         const cnpjExists = await prisma.company.findFirst({ where: { cnpj: data.cnpj } });
@@ -39,41 +39,41 @@ import { uploadToImgBB } from "../utils/imgbb.js";
     }
 
     try {
-        let companies = await prisma.company.create({data});
+        let companies = await prisma.company.create({ data });
         return res.status(201).json(companies);
     } catch (error) {
         return res.status(500).json({ erro: "Erro ao criar empresa: " + error.message });
     }
 }
 
-    export async function readCompany(req, res, _next) {
-    const {name,category,place,cnpj,zipCode,addrres,phone,userId} = req.query;
+export async function readCompany(req, res, _next) {
+    const { name, category, place, cnpj, zipCode, addrres, phone, userId } = req.query;
     let consult = { deletedAt: null, id: Number(req.companyId) } // Filtra para mostrar apenas a própria empresa
 
     // Prisma "contains" auto aplica o "%" por trás, não precisamos passar na string manualmente
-    if(name) consult.name = {contains: name};
-    if(category) consult.category = {contains: category};
-    if(place) consult.place = {contains: place};
-    if(cnpj) consult.cnpj = {contains: cnpj};
-    if(zipCode) consult.zipCode = {contains: zipCode};
-    if(addrres) consult.addrres = {contains: addrres};
-    if(phone) consult.phone = {contains: phone};
-    
+    if (name) consult.name = { contains: name };
+    if (category) consult.category = { contains: category };
+    if (place) consult.place = { contains: place };
+    if (cnpj) consult.cnpj = { contains: cnpj };
+    if (zipCode) consult.zipCode = { contains: zipCode };
+    if (addrres) consult.addrres = { contains: addrres };
+    if (phone) consult.phone = { contains: phone };
+
     // userId é inteiro no banco de dados. string "contains" nele acionaria erro interno do lado do Prisma.
-    if(userId) consult.userId = Number(userId);
+    if (userId) consult.userId = Number(userId);
 
     try {
-        let companies = await prisma.company.findMany({where: consult});
+        let companies = await prisma.company.findMany({ where: consult });
         return res.status(200).json(companies);
-    } catch(error) {
-        return res.status(500).json({ 
-            erro: "Erro interno no Prisma. IMPORTANTE: Se o erro for 'Unknown argument deletedAt', você deve DERRUBAR e REINICIAR o terminal rodando 'npm run dev', para o seu projeto assimilar o recarregamento da nova tabela no Prisma.", 
-            detalhe: error.message 
+    } catch (error) {
+        return res.status(500).json({
+            erro: "Erro interno no Prisma. IMPORTANTE: Se o erro for 'Unknown argument deletedAt', você deve DERRUBAR e REINICIAR o terminal rodando 'npm run dev', para o seu projeto assimilar o recarregamento da nova tabela no Prisma.",
+            detalhe: error.message
         });
     }
 }
 
-    export async function showCompany(req, res, _next) {
+export async function showCompany(req, res, _next) {
     let id = Number(req.params.id);
 
     // Regra: Bloquear acesso não autorizado a registros de outra empresa
@@ -82,18 +82,18 @@ import { uploadToImgBB } from "../utils/imgbb.js";
     }
 
     let company = await prisma.company.findFirst({
-        where: {id:id, deletedAt: null},
+        where: { id: id, deletedAt: null },
         include: { payments: true } // Opcional, retornando também os pagamentos
     });
-    
+
     if (!company) {
-        return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA COM ID "+ id });
+        return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA COM ID " + id });
     }
-    
+
     return res.status(200).json(company);
 }
 
-    export async function updateCompany(req,res,_next) {
+export async function updateCompany(req, res, _next) {
     let id = Number(req.params.id);
 
     // Regra: Bloquear modificação de registros de outra empresa
@@ -101,11 +101,11 @@ import { uploadToImgBB } from "../utils/imgbb.js";
         return res.status(403).json({ erro: "Acesso negado: Você só pode atualizar a sua própria empresa." });
     }
 
-    const {name,category,cnpj,places,zip_code,addrres,phone} = req.body ;        
-    let c = await prisma.company.findFirst({where : {id:id, deletedAt: null}});
-    
-    if( !c ){
-        return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA DE ID "+ id +" (ou ela foi deletada)." })
+    const { name, category, cnpj, places, zip_code, addrres, phone } = req.body;
+    let c = await prisma.company.findFirst({ where: { id: id, deletedAt: null } });
+
+    if (!c) {
+        return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA DE ID " + id + " (ou ela foi deletada)." })
     }
 
     // Regra/Exceção: Não permitir atualização para um CNPJ que já pertence a outra empresa
@@ -115,17 +115,17 @@ import { uploadToImgBB } from "../utils/imgbb.js";
             return res.status(400).json({ erro: "Exceção: CNPJ já cadastrado no sistema para outra empresa." });
         }
     }
-    
-    c = attachSave(c,"company");
 
-    if(name)        c.name      = name
-    if(category)    c.category  = category
-    if(cnpj)        c.cnpj      = cnpj
-    if(places)      c.places    = places      // CORREÇÃO: era 'c.place = places' (a tabela Prisma espera 'places' e não 'place')
-    if(zip_code)    c.zip_code  = zip_code
-    if(addrres)     c.addrres   = addrres
-    if(phone)       c.phone     = phone
-            
+    c = attachSave(c, "company");
+
+    if (name) c.name = name
+    if (category) c.category = category
+    if (cnpj) c.cnpj = cnpj
+    if (places) c.places = places      // CORREÇÃO: era 'c.place = places' (a tabela Prisma espera 'places' e não 'place')
+    if (zip_code) c.zip_code = zip_code
+    if (addrres) c.addrres = addrres
+    if (phone) c.phone = phone
+
     // Regra: Enviar imagem atualizada para o ImgBB se o usuário enviou o arquivo novo
     if (req.file) {
         try {
@@ -138,14 +138,14 @@ import { uploadToImgBB } from "../utils/imgbb.js";
     try {
         await c.save();
         return res.status(202).json(c);
-    } catch(error) {
+    } catch (error) {
         return res.status(500).json({ erro: "Erro ao atualizar a empresa.", detalhe: error.message });
     }
 }
 
-export async function deletCompany(req,res,_next) {
+export async function deletCompany(req, res, _next) {
     let id = Number(req.params.id);
-    
+
     // Regra: Bloquear exclusão de outra empresa
     if (id !== Number(req.companyId)) {
         return res.status(403).json({ erro: "Acesso negado: Você só pode deletar a sua própria empresa." });
@@ -156,12 +156,12 @@ export async function deletCompany(req,res,_next) {
     }
 
     let c = await prisma.company.findFirst({
-        where : {id:id},
+        where: { id: id },
         include: { payments: true }
     });
-    
-    if( !c ){
-        return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA COM ID "+ id });
+
+    if (!c) {
+        return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA COM ID " + id });
     }
 
     // Regra/Exceção 1: Não ter empresa com pagamento acima de 10 mil
@@ -169,7 +169,7 @@ export async function deletCompany(req,res,_next) {
     if (hasHighPayment) {
         return res.status(400).json({ erro: "Exceção: Esta empresa possui pagamentos acima de R$ 10.000,00 e não pode ser deletada." });
     }
-    
+
     try {
         // Soft Delete (Exclusão Lógica):
         // Os pagamentos/produtos continuam existindo e mantemos a empresa, mas marcamos como deletada (oculta)
@@ -179,9 +179,8 @@ export async function deletCompany(req,res,_next) {
         });
 
         return res.status(202).json({ mensagem: "EMPRESA APAGADA COM SUCESSO (Ocultada)" });
-    } catch(error) {
+    } catch (error) {
         return res.status(500).json({ erro: "Erro ao tentar deletar empresa: " + error.message });
     }
 }
 
-    

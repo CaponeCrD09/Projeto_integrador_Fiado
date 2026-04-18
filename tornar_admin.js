@@ -2,22 +2,19 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    const emailDesejado = "testeadm@gmail.com"; // Troque pelo email do usuário que você quer fazer admin
+    const emailsDesejados = ["neres@gmail.com", "admin2@gmail.com", "felipeadm@gmail.com"]; 
     
-    console.log(`Buscando usuário com email: ${emailDesejado}...`);
-    const user = await prisma.user.findFirst({ where: { email: emailDesejado } });
+    for (const email of emailsDesejados) {
+        const user = await prisma.user.findFirst({ where: { email } });
 
-    if (!user) {
-        console.log("Usuário não encontrado! Verifique o email digitado.");
-        return;
+        if (user) {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { type: "admin" }
+            });
+            console.log(`Sucesso! O usuário '${email}' (ID: ${user.id}) agora é um admin na base de dados.`);
+        }
     }
-
-    const updatedUser = await prisma.user.update({
-        where: { id: user.id },
-        data: { type: "userADM" }
-    });
-
-    console.log(`Sucesso! O usuário '${updatedUser.name}' (ID: ${updatedUser.id}) agora é um userADM.`);
 }
 
 main()

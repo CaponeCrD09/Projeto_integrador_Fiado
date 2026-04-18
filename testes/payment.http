@@ -13,31 +13,26 @@ content-type: application/json
 ### Listar todos os pagamentos
 
 GET http://localhost:3000/payment HTTP/1.1
-Authorization: Bearer {{userToken}}
 content-type: application/json
 
 
 ### mostrar
 
-GET http://localhost:3000/payment HTTP/1.1
-Authorization: Bearer {{userToken}}
+GET http://localhost:3000/payment/value_min?=10&value_max=60 HTTP/1.1
 Content-type: application/json
 
 ### mostrar
 
-GET https://projeto-integrador-fiado.onrender.com/payment/ HTTP/1.1
-Authorization: Bearer {{userToken}}
+GET http://localhost:3000/payment/ HTTP/1.1
 Content-type: application/json
 
 ###
-GET https://projeto-integrador-fiado.onrender.com/payment/userId?=2 HTTP/1.1
-Authorization: Bearer {{userToken}}
+GET http://localhost:3000/payment/userId?=2 HTTP/1.1
 Content-type: application/json
 
 ### 
 
-PUT  https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
+PUT  http://localhost:3000/payment/1 HTTP/1.1
 Content-type: application/json
 
 {
@@ -51,8 +46,7 @@ Content-type: application/json
 
 
 ###
-DELETE https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
+DELETE http://localhost:3000/payment/1 HTTP/1.1
 Content-type: application/json
 
 

@@ -1,9 +1,22 @@
 ### criando os produtos
-POST https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
+POST http://localhost:3000/product HTTP/1.1
 Content-Type: application/json
 
 {
-  "companyId":2,
+    "email": "teste@gmail.com",
+    "senha": "12345"
+}
+
+###
+@token = {{loginRequest.response.body.token}}
+
+### criando os produtos
+POST https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "companyId":1,
   "value": 20.00,
   "name": "Produto 2",
   "type": "bike",
@@ -12,18 +25,19 @@ Content-Type: application/json
 }
 
 ### Listar todos os produtos
-GET https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
+GET http://localhost:3000/product HTTP/1.1
 Content-Type: application/json
 
 
 ### Buscar produto por id
-GET https://projeto-integrador-fiado.onrender.com/product?type=bike HTTP/1.1
+GET http://localhost:3000/product?type=bike HTTP/1.1
 Content-Type: application/json
 
 ###editando todos os campos dos produtos
 
-PUT https://projeto-integrador-fiado.onrender.com/product/1 HTTP/1.1
+PUT http://localhost:3000/product/1 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   
@@ -36,5 +50,11 @@ Content-Type: application/json
 
 ### deletando um usuario
 
+<<<<<<< HEAD
+DELETE http://localhost:3000/product/16 HTTP/1.1
+Content-Type: application/json
+=======
 DELETE https://projeto-integrador-fiado.onrender.com/product/16 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer {{token}}
+>>>>>>> 247ca24c1c4e0cd976b3903e1bba7219654dd926

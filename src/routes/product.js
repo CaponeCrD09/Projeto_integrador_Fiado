@@ -13,4 +13,5 @@ router.get('/:id', showProducts);
 router.put('/:id', authMiddleware, editProducts);
 router.delete('/:id', authMiddleware, deleteProducts);
 
-export default router; 
+
+export default router;

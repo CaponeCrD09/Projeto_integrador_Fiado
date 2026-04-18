@@ -1,55 +1,69 @@
+@emailLogin = felipe_admin@gmail.com
+@senhaLogin = 1234
 
-
-
-
-### Login do usuário (retorna token JWT)
-POST https://projeto-integrador-fiado.onrender.com/user/login HTTP/1.1
+### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
+# @name realizarLogin
+POST http://localhost:3000/user/login HTTP/1.1
 content-type: application/json
 
 {
-  "email":"testeadm@gmail.com",
-  "senha":"12345"
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
 }
 
-### criando um usuario (type será automaticamente "userClient")
-### O campo "type" NÃO precisa ser enviado — o sistema calcula sozinho
-POST https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
+### Salva o Token Globalmente
+@authToken = {{realizarLogin.response.body.token}}
+
+
+# =========================================================
+# CRIAR NOVO USUÁRIO (Requer Autenticação se for criar Admin)
+# =========================================================
+
+### criando um usuario admin (Apenas se o token logado for admin)
+POST http://localhost:3000/user HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "superADM",
-  "email":"testeadm@gmail.com",
-  "senha":"12345",
-  "type":"userADM"
+  "name": "Neo client ",
+  "email":"neoclient2@gmail.com",
+  "senha":"1234",
+  "type":"userClient"
 }
-### Listar todos os usuarios (retorna com type dinâmico: userClient ou userOwner)
 
-GET https://projeto-integrador-fiado.onrender.com/user HTTP/1.1
+
+# =========================================================
+# ROTAS PROTEGIDAS (Ver, Editar, Deletar)
+# =========================================================
+
+### Listar todos os usuarios (Bloqueado para usuários comuns)
+GET http://localhost:3000/user HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### Listar apenas userOwner (usuários que possuem empresa vinculada)
-
-GET https://projeto-integrador-fiado.onrender.com/user?type=userOwner HTTP/1.1
+GET http://localhost:3000/user?type=userOwner HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### Listar apenas userClient (usuários sem empresa vinculada)
-
-GET https://projeto-integrador-fiado.onrender.com/user?type=userClient HTTP/1.1
+GET http://localhost:3000/user?type=userClient HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
-### buscar apenas um usuario (type dinâmico + empresas vinculadas incluídas)
-
-GET https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
+### buscar apenas um usuario (Qualquer um acessa SEU próprio perfil, admin acessa todos)
+GET http://localhost:3000/user/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 ### buscar por nome
-
-GET https://projeto-integrador-fiado.onrender.com/user?name=teste HTTP/1.1
+GET http://localhost:3000/user?name=teste HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
-### edita user (type NÃO pode ser alterado manualmente — é recalculado)
-
-PUT https://projeto-integrador-fiado.onrender.com/user/1 HTTP/1.1
+### edita user (NÃO MUDAR TYPE AQUI, APENAS NA CRIAÇÃO)
+PUT http://localhost:3000/user/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
@@ -59,5 +73,6 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE  https://projeto-integrador-fiado.onrender.com/user/6 HTTP/1.1
+DELETE http://localhost:3000/user/6 HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
