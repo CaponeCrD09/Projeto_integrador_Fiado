@@ -1,4 +1,6 @@
-@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJGRUxJUEVfMiIsImVtYWlsIjoidGVzdGVAZ21haWwuY29tIiwidHlwZSI6InVzZXJDbGllbnQiLCJpYXQiOjE3NzY0NjQwNDIsImV4cCI6MTc3NjU1MDQ0Mn0.ltm7ZtUU2RIqGBtvNUCn6qq30Os3Fptg1GuUEa-34C8POST http://localhost:3000/payment HTTP/1.1
+@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJzdXBlcm93bmVyIiwiZW1haWwiOiJzdXBlcjJAZ21haWwuY29tIiwidHlwZSI6InVzZXJDbGllbnQiLCJpYXQiOjE3NzY0NzQ2NDgsImV4cCI6MTc3NjU2MTA0OH0._kXbKsUfsVE8jDhC1QVG7nEGkDmIjqTDQYEkcW3ijuk
+
+POST http://localhost:3000/company HTTP/1.1
 Authorization: Bearer {{userToken}}
 content-type: application/json
 
@@ -13,26 +15,31 @@ content-type: application/json
 ### Listar todos os pagamentos
 
 GET http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
 content-type: application/json
 
 
 ### mostrar
 
-GET http://localhost:3000/payment/value_min?=10&value_max=60 HTTP/1.1
+GET http://localhost:3000/payment HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 ### mostrar
 
-GET http://localhost:3000/payment/ HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/payment/ HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 ###
-GET http://localhost:3000/payment/userId?=2 HTTP/1.1
+GET https://projeto-integrador-fiado.onrender.com/payment/userId?=2 HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 ### 
 
-PUT  http://localhost:3000/payment/1 HTTP/1.1
+PUT  https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 {
@@ -46,18 +53,19 @@ Content-type: application/json
 
 
 ###
-DELETE http://localhost:3000/payment/1 HTTP/1.1
+DELETE https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
+Authorization: Bearer {{userToken}}
 Content-type: application/json
 
 
 ###############################################
 ### TESTES DE TOKEN DE OUTRO USUARIO (DEVEM FALHAR COM 403)
-### Mensagem esperada: "Este token é invalido ou pertence a outro usuário."
+### Mensagem esperada: "Acesso Negado: Este token é invalido ou pertence a outro usuário."
 ###############################################
 
 ### ERRO: Criar pagamento com userId diferente do token
 ### O token é do usuario 1 (sub:1), mas userId no body é 2
-### Deve retornar 403: "Este token é invalido ou pertence a outro usuário."
+### Deve retornar 403: "Acesso Negado: Este token é invalido ou pertence a outro usuário."
 
 POST http://localhost:3000/payment HTTP/1.1
 Authorization: Bearer {{userToken}}
@@ -99,7 +107,7 @@ Content-type: application/json
 
 ###############################################
 ### TESTES DE EMPRESA DE OUTRO USUARIO (DEVEM FALHAR COM 403)
-### Mensagem esperada: "Esta empresa não pertence ao seu usuário."
+### Mensagem esperada: "Acesso Negado: Esta empresa não pertence ao seu usuário."
 ###############################################
 
 ### ERRO: Criar pagamento usando empresa de outro usuario

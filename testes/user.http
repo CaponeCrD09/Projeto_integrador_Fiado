@@ -1,4 +1,4 @@
-@emailLogin = superowner@gmail.com
+@emailLogin = super3@gmail.com
 @senhaLogin = 1234
 
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
@@ -26,7 +26,7 @@ content-type: application/json
 
 {
   "name": "superowner",
-  "email":"superowner@gmail.com",
+  "email":"super4@gmail.com",
   "senha":"1234",
   "type":"userOwner"
 }

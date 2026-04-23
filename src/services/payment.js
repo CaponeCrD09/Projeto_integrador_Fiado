@@ -197,8 +197,8 @@ export async function createPayment(req, res, _next) {
     if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
 
     // 5. Verifica se a empresa pertence ao usuário logado (ADM pode usar qualquer empresa)
-    if (req.logeded.type !== 'userADM' && company.userId !== req.logeded.id) {
-        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && company.userId !== Number(req.logeded.id))) {
+        return res.status(403).json({ erro: "Acesso Negado: Esta empresa não pertence ao seu usuário." });
     }
 
     const u = await prisma.payment.create({ data });
@@ -216,8 +216,8 @@ export async function readPayment(req, res, _next) {
 
     // Monta o filtro base — usuários comuns só veem seus próprios pagamentos
     const where = {};
-    if (req.logeded && req.logeded.type !== 'userADM') {
-        where.userId = req.logeded.id;
+    if (!req.logeded || req.logeded.type !== 'admin') {
+        where.userId = Number(req.logeded.id);
     }
     if (query.value !== undefined) {
         where.value = query.value;
@@ -240,14 +240,14 @@ export async function showPayment(req, res, _next) {
     if (!p) return;
 
     // Verifica se o token pertence ao usuário dono do pagamento
-    if (req.logeded && req.logeded.type !== 'userADM' && req.logeded.id !== p.userId) {
-        return res.status(403).json({ erro: "Este token é invalido ou pertence a outro usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== p.userId)) {
+        return res.status(403).json({ erro: "Acesso Negado: Este token é invalido ou pertence a outro usuário." });
     }
 
     // Verifica se a empresa do pagamento pertence ao usuário logado
     const company = await prisma.company.findFirst({ where: { id: p.companyId } });
-    if (req.logeded && req.logeded.type !== 'userADM' && company && company.userId !== req.logeded.id) {
-        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && company && company.userId !== Number(req.logeded.id))) {
+        return res.status(403).json({ erro: "Acesso Negado: Esta empresa não pertence ao seu usuário." });
     }
 
     return res.status(200).json(p);
@@ -269,14 +269,14 @@ export async function updatePayment(req, res, _next) {
     if (!p) return;
 
     // 3. Verifica se o token pertence ao usuário dono do pagamento (ADM pode editar qualquer um)
-    if (req.logeded && req.logeded.type !== 'userADM' && req.logeded.id !== p.userId) {
-        return res.status(403).json({ erro: "Este token é invalido ou pertence a outro usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== p.userId)) {
+        return res.status(403).json({ erro: "Acesso Negado: Este token é invalido ou pertence a outro usuário." });
     }
 
     // 4. Verifica se a empresa do pagamento pertence ao usuário logado
     const companyAtual = await prisma.company.findFirst({ where: { id: p.companyId } });
-    if (req.logeded && req.logeded.type !== 'userADM' && companyAtual && companyAtual.userId !== req.logeded.id) {
-        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && companyAtual && companyAtual.userId !== Number(req.logeded.id))) {
+        return res.status(403).json({ erro: "Acesso Negado: Esta empresa não pertence ao seu usuário." });
     }
 
     // 5. Valida os campos do body (schema parcial — tudo opcional)
@@ -287,8 +287,8 @@ export async function updatePayment(req, res, _next) {
     if (data.companyId !== undefined) {
         const company = await prisma.company.findFirst({ where: { id: data.companyId } });
         if (!company) return res.status(404).json({ error: `Empresa com ID ${data.companyId} não encontrada.` });
-        if (req.logeded && req.logeded.type !== 'userADM' && company.userId !== req.logeded.id) {
-            return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+        if (!req.logeded || (req.logeded.type !== 'admin' && company.userId !== Number(req.logeded.id))) {
+            return res.status(403).json({ erro: "Acesso Negado: Esta empresa não pertence ao seu usuário." });
         }
     }
 
@@ -319,14 +319,14 @@ export async function deletePayment(req, res, _next) {
     if (!d) return;
 
     // Verifica se o token pertence ao usuário dono do pagamento (ADM pode deletar qualquer um)
-    if (req.logeded && req.logeded.type !== 'userADM' && req.logeded.id !== d.userId) {
-        return res.status(403).json({ erro: "Este token é invalido ou pertence a outro usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== d.userId)) {
+        return res.status(403).json({ erro: "Acesso Negado: Este token é invalido ou pertence a outro usuário." });
     }
 
     // Verifica se a empresa do pagamento pertence ao usuário logado
     const company = await prisma.company.findFirst({ where: { id: d.companyId } });
-    if (req.logeded && req.logeded.type !== 'userADM' && company && company.userId !== req.logeded.id) {
-        return res.status(403).json({ erro: "Esta empresa não pertence ao seu usuário." });
+    if (!req.logeded || (req.logeded.type !== 'admin' && company && company.userId !== Number(req.logeded.id))) {
+        return res.status(403).json({ erro: "Acesso Negado: Esta empresa não pertence ao seu usuário." });
     }
 
     await prisma.payment.delete({ where: { id } });
