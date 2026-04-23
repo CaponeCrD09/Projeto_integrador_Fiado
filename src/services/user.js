@@ -63,6 +63,29 @@ export async function loginUser(req, res, _next) {
 
 export async function createUser(req, res, _next) {
     try {
+        // Regra do primeiro usuário do banco
+        const userCount = await prisma.user.count();
+        if (userCount === 0) {
+            let initialAdmin = await prisma.user.create({
+                data: {
+                    name: "admin",
+                    type: "admin",
+                    email: "admin@admin",
+                    senha: "admin"
+                }
+            });
+            return res.status(201).json(initialAdmin);
+        }
+
+        // Restante do código (O banco NÃO está vazio, então precisa estar logado)
+        if (!req.logeded) {
+            return res.status(401).json({ erro: "Você precisa estar logado." });
+        }
+
+        if(req.logeded.type === "userClient"){
+           return res.status(403).json({ erro: "Acesso Negado: Você não tem permissão para criar usuários." });
+        }
+
         const { name, email, senha, type } = req.body;
 
         // Verifica se já existe um usuário com o mesmo email
@@ -72,46 +95,15 @@ export async function createUser(req, res, _next) {
         }
 
         let finalType = "userClient";
-        let loggedUserType = null;
-        const authHeader = req.headers.authorization;
 
-        // 1. Extração manual do JWT para verificar a role do criador
-        if (authHeader) {
-            const parts = authHeader.split(' ');
-            if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
-                try {
-                    const secret = process.env.JWT_SECRET || 'secret_key_default';
-                    const payload = jwt.verify(parts[1], secret);
-                    loggedUserType = payload.type;
-                } catch (e) {
-                    // Token inválido: segue como não autenticado
-                }
-            }
-        }
-
-        // 2. Aplicação da Hierarquia
-        if (loggedUserType === 'admin') {
-            // Regra do Admin: Pode criar qualquer um
+        if(req.logeded.type === "admin"){
             finalType = type || "userClient";
-        } else if (loggedUserType === 'userOwner') {
-            // Regra do Owner: Apenas criar Clients. Bloqueia ativamente tentativas de criar Admin/Owner
-            if (type && type !== 'userClient') {
-                return res.status(403).json({ erro: "Acesso Negado: Proprietários só têm permissão para cadastrar Clientes (userClient)." });
-            }
-            finalType = "userClient";
-        } else {
-            // Regra Pública/Cliente: Força a criação padrão e ignora tentativas maliciosas
-            finalType = "userClient";
         }
-
-        // Feature de proteção: Permite criar o primeiro admin caso o banco esteja inteiramente recém-limpo 
-        if (type === 'admin' && finalType !== 'admin') {
-            const userCount = await prisma.user.count();
-            if (userCount === 0) {
-                finalType = 'admin';
-            }
+        
+        // Correção de sintaxe para validar vários valores
+        if(finalType !== "admin" && finalType !== "userOwner" && finalType !== "userClient"){
+            return res.status(400).json({ erro: "Tipo de usuário inválido." });
         }
-
         // Cria o usuário
         let u = await prisma.user.create({
             data: {
@@ -121,6 +113,8 @@ export async function createUser(req, res, _next) {
                 senha,
             },
         });
+
+
 
         return res.status(201).json(u);
     } catch (error) {
