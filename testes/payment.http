@@ -1,18 +1,17 @@
-@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJzdXBlcm93bmVyIiwiZW1haWwiOiJzdXBlcjJAZ21haWwuY29tIiwidHlwZSI6InVzZXJDbGllbnQiLCJpYXQiOjE3NzY0NzQ2NDgsImV4cCI6MTc3NjU2MTA0OH0._kXbKsUfsVE8jDhC1QVG7nEGkDmIjqTDQYEkcW3ijuk
-
-POST http://localhost:3000/company HTTP/1.1
+@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsIm5hbWUiOiJmZWxpcGUwMDAiLCJlbWFpbCI6IjEwMDUwQGdtYWlsLmNvbSIsInR5cGUiOiJ1c2VyT3duZXIiLCJpYXQiOjE3NzY5ODkyMDUsImV4cCI6MTc3NzA3NTYwNX0.mu7J_I5LclCMT6Sb6BI-8a8XoRY0-4rZde6-9X4DY5U
+POST http://localhost:3000/payment HTTP/1.1   
 Authorization: Bearer {{userToken}}
 content-type: application/json
 
 {
-    "companyId":2,
+    "companyId":7,
     "value":20.0,      
     "method":"pix",  
-    "toDate":"2026-04-18T00:00:01.000Z",       
-    "dueDate":"2026-04-19T00:00:00.000Z"
+    "toDate":"2026-04-23T21:04:01.000Z",       
+    "dueDate":"2026-04-25T00:00:00.000Z"
 }
 
-### Listar todos os pagamentos
+### Listar todos os pagamentos  
 
 GET http://localhost:3000/payment HTTP/1.1
 Authorization: Bearer {{userToken}}
