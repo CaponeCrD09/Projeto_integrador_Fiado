@@ -1,31 +1,19 @@
-@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksIm5hbWUiOiJtbnRlc3RlIiwiZW1haWwiOiJtbnRlc3RlQGdtYWlsLmNvbSIsInR5cGUiOiJ1c2VyT3duZXIiLCJpYXQiOjE3NzY5ODk5MzcsImV4cCI6MTc3NzA3NjMzN30.Ah6JGH_BFK2N0Cfq38BFPxh8RtfeIaV3LovEGpaLQVA
-
-### Realizar Login para pegar Token (opcional se já preencheu acima)
+### Realizar Login para pegar Token automaticamente
+# @name realizarLogin
 POST https://projeto-integrador-fiado.onrender.com/user/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "email": "admin@admin",
-    "senha": "admin"
+    "email": "teste@gmail.com",
+    "senha": "1234"
 }
 
-
-### criando os produtos na nuvem
-POST https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer {{userToken}}
-
-{
-  "value": 30.00,
-  "name": "teste na nuvem",
-  "type": "bike",
-  "description": "Produto na nuvem",
-  "url_img": "https://example.com/image.jpg"
-}
+### Salva o Token Globalmente para os produtos
+@userToken = {{realizarLogin.response.body.token}}
 
 
 ### criando os produtos
-POST http://localhost:3000/product HTTP/1.1
+POST https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{userToken}}
 
@@ -63,5 +51,5 @@ Authorization: Bearer {{userToken}}
 
 ### deletando um usuario
 
-DELETE http://localhost:3000/product/16 HTTP/1.1
+DELETE https://projeto-integrador-fiado.onrender.com/product/16 HTTP/1.1
 Content-Type: application/json
