@@ -1,5 +1,5 @@
-@emailLogin = teste@gmail.com
-@senhaLogin = 1234
+@emailLogin = admin@admin
+@senhaLogin = admin
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
