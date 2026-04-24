@@ -1,60 +1,74 @@
-@userToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsIm5hbWUiOiJmZWxpcGUwMDAiLCJlbWFpbCI6IjEwMDUwQGdtYWlsLmNvbSIsInR5cGUiOiJ1c2VyT3duZXIiLCJpYXQiOjE3NzY5ODkyMDUsImV4cCI6MTc3NzA3NTYwNX0.mu7J_I5LclCMT6Sb6BI-8a8XoRY0-4rZde6-9X4DY5U
-POST http://localhost:3000/payment HTTP/1.1   
-Authorization: Bearer {{userToken}}
+@emailLogin = admin@admin
+@senhaLogin = admin
+
+@baseUrl = http://localhost:3000
+
+// https://projeto-integrador-fiado.onrender.com
+
+### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
+# @name realizarLogin
+
+POST {{baseUrl}}/user/login HTTP/1.1
+content-type: application/json
+
+{
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
+}
+
+### Salva o Token Globalmente
+@authToken = {{realizarLogin.response.body.token}}
+
+
+# =========================================================
+# CRIAR PAGAMENTO
+# =========================================================
+
+### Criar pagamento
+POST {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
     "companyId":7,
     "value":20.0,      
     "method":"pix",  
-    "toDate":"2026-04-23T21:04:01.000Z",       
+    "toDate":"2026-04-01T00:00:01.000Z",       
     "dueDate":"2026-04-25T00:00:00.000Z"
 }
 
-### Listar todos os pagamentos  
 
-GET http://localhost:3000/payment HTTP/1.1
-Authorization: Bearer {{userToken}}
+# =========================================================
+# ROTAS PROTEGIDAS (Listar, Ver, Editar, Deletar)
+# =========================================================
+
+### Listar todos os pagamentos
+GET {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
+### Mostrar pagamento por ID
+GET {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
-### mostrar
-
-GET http://localhost:3000/payment HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
-
-### mostrar
-
-GET https://projeto-integrador-fiado.onrender.com/payment/ HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
-
-###
-GET https://projeto-integrador-fiado.onrender.com/payment/userId?=2 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
-
-### 
-
-PUT  https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
+### Editar pagamento
+PUT {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
 {
-    "companyId":1,
+    "companyId":7,
     "value":20.0,      
     "method":"boleto",  
-    "toDate":"2026-04-017T00:00:00.000Z",       
-    "dueDate":"2022-04-18T00:00:00.000Z",        
-    "userId":1
+    "toDate":"2026-04-01T00:00:00.000Z",       
+    "dueDate":"2026-04-25T00:00:00.000Z"
 }
 
-
-###
-DELETE https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
+### Deletar pagamento
+DELETE {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
 
 ###############################################
@@ -66,8 +80,8 @@ Content-type: application/json
 ### O token é do usuario 1 (sub:1), mas userId no body é 2
 ### Deve retornar 403: "Acesso Negado: Este token é invalido ou pertence a outro usuário."
 
-POST http://localhost:3000/payment HTTP/1.1
-Authorization: Bearer {{userToken}}
+POST {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
@@ -82,16 +96,16 @@ content-type: application/json
 ### ERRO: Ver pagamento que pertence a outro usuario
 ### Deve retornar 403 se o pagamento não pertence ao usuario do token
 
-GET https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
+GET {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
 ### ERRO: Editar pagamento que pertence a outro usuario
 ### Deve retornar 403 se o pagamento não pertence ao usuario do token
 
-PUT https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
+PUT {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
 {
     "value": 50.0
@@ -100,9 +114,9 @@ Content-type: application/json
 ### ERRO: Deletar pagamento que pertence a outro usuario
 ### Deve retornar 403 se o pagamento não pertence ao usuario do token
 
-DELETE https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
+DELETE {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
 ###############################################
 ### TESTES DE EMPRESA DE OUTRO USUARIO (DEVEM FALHAR COM 403)
@@ -112,8 +126,8 @@ Content-type: application/json
 ### ERRO: Criar pagamento usando empresa de outro usuario
 ### Se a empresa com companyId não pertence ao usuario do token, retorna 403
 
-POST http://localhost:3000/payment HTTP/1.1
-Authorization: Bearer {{userToken}}
+POST {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
@@ -127,9 +141,9 @@ content-type: application/json
 ### ERRO: Editar pagamento trocando para empresa de outro usuario
 ### Deve retornar 403 se a nova companyId não pertence ao usuario do token
 
-PUT https://projeto-integrador-fiado.onrender.com/payment/1 HTTP/1.1
-Authorization: Bearer {{userToken}}
-Content-type: application/json
+PUT {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
 
 {
     "companyId": 999
