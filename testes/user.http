@@ -30,10 +30,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "felipe000",
-  "email":"10050@gmail.com",
+  "name": "felipeclient",
+  "email":"1005client@gmail.com",
   "senha":"1234",
-  "type":""
+  "type":"userClient"
 }
 
 

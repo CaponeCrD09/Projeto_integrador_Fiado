@@ -68,6 +68,7 @@ export async function createUser(req, res, _next) {
         if (userCount === 0) {
             let initialAdmin = await prisma.user.create({
                 data: {
+                    id: 1,
                     name: "admin",
                     type: "admin",
                     email: "admin@admin",
