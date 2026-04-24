@@ -1,9 +1,9 @@
 @emailLogin = neresx3@gmail.com
 @senhaLogin = 1234
 
-@baseUrl = http://localhost:3000
+@baseUrl = https://projeto-integrador-fiado.onrender.com
 
-// https://projeto-integrador-fiado.onrender.com
+//https://projeto-integrador-fiado.onrender.com
 
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
 # @name realizarLogin
