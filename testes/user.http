@@ -1,9 +1,13 @@
-@baseUrl = {{baseUrl}}
-@emailLogin = superowner@gmail.com
+@emailLogin = neresx3@gmail.com
 @senhaLogin = 1234
+
+@baseUrl = http://localhost:3000
+
+// https://projeto-integrador-fiado.onrender.com
 
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
 # @name realizarLogin
+
 POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
@@ -26,10 +30,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "superowner",
-  "email":"superowner@gmail.com",
+  "name": "felipe000",
+  "email":"10050@gmail.com",
   "senha":"1234",
-  "type":"userOwner"
+  "type":""
 }
 
 
@@ -74,8 +78,6 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE {{baseUrl}}/user/6 HTTP/1.1
+DELETE {{baseUrl}}/user/17 HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
-
-
