@@ -1,9 +1,9 @@
-@emailLogin = mnteste@gmail.com
-@senhaLogin = 1234
+@emailLogin = admin@admin
+@senhaLogin = admin
 
-@baseUrl = http://localhost:3000
+@baseUrl = https://projeto-integrador-fiado.onrender.com
 
-// https://projeto-integrador-fiado.onrender.com
+//https://projeto-integrador-fiado.onrender.com
 
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
 # @name realizarLogin
@@ -30,8 +30,8 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "mnteste",
-  "email":"mnteste@gmail.com",
+  "name": "teste",
+  "email":"teste@gmail.com",
   "senha":"1234",
   "type":"userOwner"
 }
