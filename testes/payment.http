@@ -1,7 +1,7 @@
 @emailLogin = admin@admin
 @senhaLogin = admin
 
-@baseUrl = http://localhost:3000
+@baseUrl = https://projeto-integrador-fiado.onrender.com
 
 // https://projeto-integrador-fiado.onrender.com
 

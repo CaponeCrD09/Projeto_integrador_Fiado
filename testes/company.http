@@ -2,7 +2,7 @@
 # =============================================
 # VARIÁVEIS GLOBAIS — altere aqui suas credenciais
 # =============================================
-@baseUrl    = http://localhost:3000
+@baseUrl    = https://projeto-integrador-fiado.onrender.com
 @companyUrl = {{baseUrl}}/company
 @email      = teste@gmail.com
 @senha      = 1234
