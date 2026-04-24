@@ -1,4 +1,4 @@
-@emailLogin = neresx3@gmail.com
+@emailLogin = mnteste@gmail.com
 @senhaLogin = 1234
 
 @baseUrl = http://localhost:3000
@@ -30,10 +30,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "felipeclient",
-  "email":"1005client@gmail.com",
+  "name": "mnteste",
+  "email":"mnteste@gmail.com",
   "senha":"1234",
-  "type":"userClient"
+  "type":"userOwner"
 }
 
 
