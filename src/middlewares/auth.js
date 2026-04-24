@@ -35,6 +35,7 @@ export const authMiddleware = (req, res, next) => {
 
     return next();
   } catch (e) {
-    return res.status(403).json({ error: 'Token inválido' });
+    console.error("JWT Verify Error:", e);
+    return res.status(403).json({ error: 'Token inválido', detalhe: e.message });
   }
 };

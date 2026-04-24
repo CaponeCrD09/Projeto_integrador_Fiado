@@ -59,11 +59,7 @@ const paymentFields = z.object({
         ),
 
     toDate: z
-        .string({ invalid_type_error: "O campo 'toDate' deve ser uma string no formato ISO." })
-        .refine((d) => {
-            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-            return new Date(d) >= hoje;
-        }, { message: "A data de início (toDate) não pode ser uma data passada." }),
+        .string({ invalid_type_error: "O campo 'toDate' deve ser uma string no formato ISO." }),
 
     dueDate: z
         .string({ invalid_type_error: "O campo 'dueDate' deve ser uma string no formato ISO." }),
@@ -71,19 +67,10 @@ const paymentFields = z.object({
 });
 
 const paymentBaseSchema = paymentFields
-    // Validação cruzada 1: dueDate não pode ser anterior a toDate
+    // Validação cruzada: dueDate não pode ser anterior a toDate
     .refine(
         ({ toDate, dueDate }) => new Date(dueDate) >= new Date(toDate),
         { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
-    )
-    // Validação cruzada 2: dueDate deve estar dentro do limite de 3 meses
-    .refine(
-        ({ toDate, dueDate }) => {
-            const limite = new Date(toDate);
-            limite.setMonth(limite.getMonth() + 3);
-            return new Date(dueDate) <= limite;
-        },
-        { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
     );
 
 /**
@@ -106,17 +93,6 @@ const updateSchema = paymentFields.partial()
             return true;
         },
         { message: "A data de vencimento (dueDate) não pode ser anterior à data de início.", path: ["dueDate"] }
-    )
-    .refine(
-        (data) => {
-            if (data.toDate && data.dueDate) {
-                const limite = new Date(data.toDate);
-                limite.setMonth(limite.getMonth() + 3);
-                return new Date(data.dueDate) <= limite;
-            }
-            return true;
-        },
-        { message: "O prazo máximo de pagamento é de 3 meses após a data de início.", path: ["dueDate"] }
     );
 
 /**
@@ -181,7 +157,12 @@ async function findPaymentOrFail(id, res) {
  * a existência de userId e companyId no banco de dados.
  */
 export async function createPayment(req, res, _next) {
-    // 1. Valida o corpo da requisição com o schema de criação
+    // 1. Bloqueio RBAC: userClient não pode criar pagamentos
+    if (req.logeded && req.logeded.type === 'userClient') {
+        return res.status(403).json({ erro: "Acesso Negado: Você não tem permissão para criar pagamentos." });
+    }
+
+    // 2. Valida o corpo da requisição com o schema de criação
     const data = validate(createSchema, req.body, res);
     if (!data) return;
 
@@ -239,6 +220,14 @@ export async function showPayment(req, res, _next) {
     const p = await findPaymentOrFail(id, res);
     if (!p) return;
 
+    // userClient: só pode ver pagamentos onde ele é o userId (vinculado a ele)
+    if (req.logeded && req.logeded.type === 'userClient') {
+        if (Number(req.logeded.id) !== p.userId) {
+            return res.status(403).json({ erro: "Acesso Negado: Este pagamento não pertence a você." });
+        }
+        return res.status(200).json(p);
+    }
+
     // Verifica se o token pertence ao usuário dono do pagamento
     if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== p.userId)) {
         return res.status(403).json({ erro: "Acesso Negado: Este token é invalido ou pertence a outro usuário." });
@@ -268,8 +257,16 @@ export async function updatePayment(req, res, _next) {
     let p = await findPaymentOrFail(id, res);
     if (!p) return;
 
-    // 3. Verifica se o token pertence ao usuário dono do pagamento (ADM pode editar qualquer um)
-    if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== p.userId)) {
+    // 3. Bloqueio RBAC: admin e userClient não podem modificar pagamentos
+    if (req.logeded && req.logeded.type === 'admin') {
+        return res.status(403).json({ erro: "Acesso Negado: Administradores não podem modificar pagamentos." });
+    }
+    if (req.logeded && req.logeded.type === 'userClient') {
+        return res.status(403).json({ erro: "Acesso Negado: Você não tem permissão para editar pagamentos." });
+    }
+
+    // 4. Verifica se o token pertence ao usuário dono do pagamento
+    if (!req.logeded || Number(req.logeded.id) !== p.userId) {
         return res.status(403).json({ erro: "Acesso Negado: Este token é invalido ou pertence a outro usuário." });
     }
 
@@ -317,6 +314,11 @@ export async function deletePayment(req, res, _next) {
 
     const d = await findPaymentOrFail(id, res);
     if (!d) return;
+
+    // Bloqueio RBAC: userClient não pode deletar pagamentos
+    if (req.logeded && req.logeded.type === 'userClient') {
+        return res.status(403).json({ erro: "Acesso Negado: Você não tem permissão para deletar pagamentos." });
+    }
 
     // Verifica se o token pertence ao usuário dono do pagamento (ADM pode deletar qualquer um)
     if (!req.logeded || (req.logeded.type !== 'admin' && Number(req.logeded.id) !== d.userId)) {

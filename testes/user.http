@@ -1,5 +1,5 @@
-@emailLogin = neresx3@gmail.com
-@senhaLogin = 1234
+@emailLogin = admin@admin
+@senhaLogin = admin
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
@@ -30,10 +30,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "felipeclient",
-  "email":"1005client@gmail.com",
+  "name": "teste",
+  "email":"teste@gmail.com",
   "senha":"1234",
-  "type":"userClient"
+  "type":"userOwner"
 }
 
 

@@ -12,6 +12,13 @@ import { uploadToImgBB } from "../utils/imgbb.js";
 export async function createCompany(req, res, _next) {
     const data = req.body;
 
+    if (!req.logeded) {
+        return res.status(401).json({ error: "Usuário não autenticado." });
+    }
+
+    // Associa a empresa ao usuário logado, ignorando qualquer userId enviado no body
+    data.userId = req.logeded.id;
+
     // Regra/Exceção: Não permitir cadastro de CNPJ duplicado
     if (data.cnpj) {
         const cnpjExists = await prisma.company.findFirst({ where: { cnpj: data.cnpj } });
