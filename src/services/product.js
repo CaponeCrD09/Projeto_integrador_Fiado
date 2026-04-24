@@ -26,6 +26,25 @@ export async function createProducts(req, res, _next) {
     try {
         const data = req.body
 
+        if (!req.logeded) {
+            return res.status(401).json({ error: "Usuário não autenticado." });
+        }
+
+        const userCompany = await prisma.company.findFirst({
+            where: { userId: req.logeded.id }
+        });
+
+        if (!userCompany) {
+            return res.status(403).json({ error: "Você precisa ter uma empresa vinculada para criar produtos." });
+        }
+
+        // Associa o produto à empresa do usuário logado
+        data.companyId = userCompany.id;
+
+        // Remove campos indesejados caso tenham sido enviados por engano (ex: copiado do user.http)
+        delete data.email;
+        delete data.senha;
+
         if (hasIllegalProductData(data)) {
             return res.status(400).json({ error: "Não é permitido cadastrar produtos ilícitos." });
         }
@@ -56,57 +75,71 @@ export async function showProducts(req, res, _next) {
 }
 
 export async function editProducts(req, res, _next) {
+    try {
+        let id = Number(req.params.id);
+        const { value, name, type, description, url_img } = req.body;
 
-    let id = Number(req.params.id);
-    const { value, name, type, description, url_img } = req.body;
+        if (hasIllegalProductData({ name, type, description })) {
+            return res.status(400).json({ error: "Não é permitido editar para produtos ilícitos." });
+        }
 
-    if (hasIllegalProductData({ name, type, description })) {
-        return res.status(400).json({ error: "Não é permitido editar para produtos ilícitos." });
+        let p = await prisma.product.findFirst({
+            where: { id: id },
+            include: { companies: true }
+        });
+
+        if (!p) {
+            return res.status(404).json({ error: "Não encontrei o produto" });
+        }
+
+        let userId = req.logeded ? req.logeded.id : null;
+        if (!userId || p.companies.userId !== userId) {
+            return res.status(403).json({ error: "Apenas o dono do produto pode editá-lo." });
+        }
+
+        p = attachSave(p, 'product');
+
+        if (value) p.value = value;
+        if (name) p.name = name;
+        if (type) p.type = type;
+        if (description) p.description = description;
+        if (url_img) p.url_img = url_img;
+
+        await p.save();
+        return res.status(202).json(p);
+    } catch (error) {
+        return res.status(500).json({ error: "Erro interno", detalhe: error.message });
     }
-
-    let p = await prisma.product.findFirst({ where: { id: id } });
-
-    if (!p) {
-        return res.status(404).json("Não encontrei" + id);
-    }
-    p = attachSave(p, 'product');
-
-    if (value) p.value = value;
-    if (name) p.name = name;
-    if (type) p.type = type;
-    if (description) p.description = description;
-    if (url_img) p.url_img = url_img;
-
-
-    await p.save();
-    return res.status(202).json(p);
 }
 
 
 export async function deleteProducts(req, res, _next) {
+    try {
+        let id = Number(req.params.id);
+        let userId = req.logeded ? req.logeded.id : null;
 
-    let id = Number(req.params.id);
-    let userId = req.body.userId || Number(req.query.userId) || Number(req.headers.userid);
+        if (!userId) {
+            return res.status(401).json({ error: "Usuário não autenticado." });
+        }
 
-    if (!userId) {
-        return res.status(400).json({ error: "É necessário informar o userId para excluir o produto." });
+        let d = await prisma.product.findFirst({
+            where: { id: id },
+            include: { companies: true }
+        });
+
+        if (!d) {
+            return res.status(404).json({ error: "Não encontrado" + id });
+        }
+
+        if (d.companies.userId !== userId) {
+            return res.status(403).json({ error: "Apenas o dono do produto pode excluí-lo." });
+        }
+
+        await prisma.product.delete({ where: { id: id } });
+        return res.status(202).json("produto deletado");
+    } catch (error) {
+        return res.status(500).json({ error: "Erro interno", detalhe: error.message });
     }
-
-    let d = await prisma.product.findFirst({
-        where: { id: id },
-        include: { companies: true }
-    });
-
-    if (!d) {
-        return res.status(404).json({ error: "Não encontrado" + id });
-    }
-
-    if (d.companies.userId !== userId) {
-        return res.status(403).json({ error: "Apenas o dono do produto pode excluí-lo." });
-    }
-
-    await prisma.product.delete({ where: { id: id } });
-    return res.status(202).json("produto deletado");
 }
 
 

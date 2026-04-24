@@ -4,7 +4,7 @@
 # =============================================
 @baseUrl    = http://localhost:3000
 @companyUrl = {{baseUrl}}/company
-@email      = flinho@gmail.com
+@email      = mnteste@gmail.com
 @senha      = 1234
 
 
