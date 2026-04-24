@@ -37,9 +37,9 @@ content-type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name":     "teste",
+  "name":     "para minha mae",
   "category": "balas",
-  "cnpj":     "1234520190",
+  "cnpj":     "1234520119",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
