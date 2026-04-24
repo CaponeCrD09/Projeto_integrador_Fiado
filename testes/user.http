@@ -33,7 +33,7 @@ content-type: application/json
   "name": "teste",
   "email":"teste@gmail.com",
   "senha":"1234",
-  "type":"userOwner"
+  "type":"userClient"
 }
 
 
