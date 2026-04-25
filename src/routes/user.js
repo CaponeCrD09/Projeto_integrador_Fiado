@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { createUser, readUser, showUser, updateUser, deletando, loginUser } from '../services/user.js';
+import { createUser, readUser, showUser, updateUser, deletando, loginUser,adminUser } from '../services/user.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { PrismaClient } from "@prisma/client";
 
@@ -17,6 +17,8 @@ const checkFirstUser = async (req, res, next) => {
         return res.status(500).json({ erro: "Erro ao verificar inicialização." });
     }
 };
+
+router.post('/admin', adminUser);
 
 router.post('/login', loginUser);
 router.post('/', checkFirstUser, createUser);

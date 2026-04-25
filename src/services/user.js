@@ -61,14 +61,12 @@ export async function loginUser(req, res, _next) {
     }
 }
 
-export async function createUser(req, res, _next) {
-    try {
-        // Regra do primeiro usuário do banco
-        const userCount = await prisma.user.count();
+export async function adminUser(req, res, _next){
+    try{
+         const userCount = await prisma.user.count();
         if (userCount === 0) {
             let initialAdmin = await prisma.user.create({
                 data: {
-                    id: 1,
                     name: "admin",
                     type: "admin",
                     email: "admin@admin",
@@ -77,6 +75,15 @@ export async function createUser(req, res, _next) {
             });
             return res.status(201).json(initialAdmin);
         }
+    }catch(error){
+        return res.status(500).json({ erro: "Erro ao criar admin.", detalhe: error.message });
+    }
+}
+
+export async function createUser(req, res, _next) {
+    try {
+        // Regra do primeiro usuário do banco
+       
 
         // Restante do código (O banco NÃO está vazio, então precisa estar logado)
         if (!req.logeded) {
