@@ -5,6 +5,11 @@
 
 //https://projeto-integrador-fiado.onrender.com
 
+### admin
+POST {{baseUrl}}/user/admin HTTP/1.1
+content-type: application/json
+
+
 ### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
 # @name realizarLogin
 
