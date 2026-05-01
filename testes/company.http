@@ -4,8 +4,10 @@
 # =============================================
 @baseUrl    = https://projeto-integrador-fiado.onrender.com
 @companyUrl = {{baseUrl}}/company
-@email      = teste@gmail.com
-@senha      = 1234
+
+@email      = admin@admin
+
+@senha      = admin
 
 
 # =============================================
@@ -31,25 +33,24 @@ content-type: application/json
 # ROTAS PROTEGIDAS (precisam de token)
 # =============================================
 
-### Criar company (admin ou userOwner)
-POST {{companyUrl}} HTTP/1.1
+### Criar company (Apenas userOwner)
+POST {{baseUrl}}/company HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name":     "para minha mae",
+  "name":     "abrobrinha",
   "category": "balas",
-  "cnpj":     "1234520119",
+  "cnpj":     "12452091",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
-  "phone":    "190",
-  "userId":   2
+  "phone":    "190"
 }
 
 
 ### Atualizar company (admin ou userOwner — só a própria)
-PUT {{companyUrl}}/1 HTTP/1.1
+PUT {{baseUrl}}/company/23 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{token}}
 
@@ -65,7 +66,7 @@ Authorization: Bearer {{token}}
 
 
 ### Deletar company (admin ou userOwner — só a própria)
-DELETE {{companyUrl}}/1 HTTP/1.1
+DELETE {{baseUrl}}/company/20 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{token}}
 
@@ -75,22 +76,18 @@ Authorization: Bearer {{token}}
 # =============================================
 
 ### Listar todas as companies
-GET {{companyUrl}} HTTP/1.1
+GET {{baseUrl}}/company HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{token}}
 
 
 ### Buscar uma company por ID
-GET {{companyUrl}}/2 HTTP/1.1
+GET {{baseUrl}}/company/2 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{token}}
 
 
 ### Buscar por nome
-GET {{companyUrl}}?name=abrobrinha HTTP/1.1
+GET {{baseUrl}}/company?name=teste HTTP/1.1
 content-type: application/json
 
-
-### Buscar por tipo
-GET {{companyUrl}}?type=bo HTTP/1.1
-content-type: application/json
