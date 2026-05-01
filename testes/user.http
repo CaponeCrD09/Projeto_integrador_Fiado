@@ -34,9 +34,9 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "testes2",
-  "email":"teste33@teste",
-  "senha":"teste",
+  "name": "testes",
+  "email":"teste@teste",
+  "senha":"123",
   "type":"userOwner"
 }
 
