@@ -1,5 +1,5 @@
-@emailLogin = teste@teste
-@senhaLogin = 123
+@emailLogin = admin@admin
+@senhaLogin = admin
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
@@ -32,7 +32,7 @@ Authorization: Bearer {{authToken}}
 {
   "name":     "teste3",
   "category": "balas",
-  "cnpj":     "12f43342",
+  "cnpj":     "12dfd43342",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
