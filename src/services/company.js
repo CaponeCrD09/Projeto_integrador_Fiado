@@ -16,6 +16,10 @@ export async function createCompany(req, res, _next) {
         return res.status(401).json({ error: "Usuário não autenticado." });
     }
 
+    if (req.logeded.type !== 'userOwner') {
+        return res.status(403).json({ error: "Apenas usuários do tipo userOwner podem criar empresas." });
+    }
+
     // Associa a empresa ao usuário logado, ignorando qualquer userId enviado no body
     data.userId = Number(req.logeded.id);
 

@@ -1,5 +1,5 @@
-@emailLogin = admin@admin
-@senhaLogin = admin
+@emailLogin = teste@teste
+@senhaLogin = 123
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
@@ -32,7 +32,7 @@ Authorization: Bearer {{authToken}}
 {
   "name":     "teste3",
   "category": "balas",
-  "cnpj":     "124352192",
+  "cnpj":     "12f43342",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
@@ -41,7 +41,7 @@ Authorization: Bearer {{authToken}}
 
 
 ### Atualizar company (admin ou userOwner — só a própria)
-PUT {{baseUrl}}/company/27 HTTP/1.1
+PUT {{baseUrl}}/company/34 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{authToken}}
 

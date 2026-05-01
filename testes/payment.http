@@ -1,5 +1,5 @@
-@emailLogin = admin@admin
-@senhaLogin = admin
+@emailLogin = teste@teste
+@senhaLogin = 123
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
@@ -30,7 +30,7 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-    "companyId":26,
+    "companyId":33,
     "value":20.0,      
     "method":"pix",  
     "toDate":"2026-04-01T00:00:01.000Z",       
