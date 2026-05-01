@@ -32,7 +32,7 @@ Authorization: Bearer {{authToken}}
 {
   "name":     "teste3",
   "category": "balas",
-  "cnpj":     "12dfd43342",
+  "cnpj":     "12dddddfdd43342",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
@@ -63,19 +63,17 @@ Authorization: Bearer {{authToken}}
 
 
 # =============================================
-# ROTAS DE LEITURA (token opcional)
+# ROTAS DE LEITURA (token nao necessario)
 # =============================================
 
 ### Listar todas as companies
 GET {{baseUrl}}/company HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{authToken}}
 
 
 ### Buscar uma company por ID
 GET {{baseUrl}}/company/26 HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{authToken}}
 
 
 ### Buscar por nome
