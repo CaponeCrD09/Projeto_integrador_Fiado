@@ -1,47 +1,56 @@
-### Realizar Login para pegar Token automaticamente
+@emailLogin = admin@admin
+@senhaLogin = admin
+
+@baseUrl = https://projeto-integrador-fiado.onrender.com
+
+//@baseUrl = http://localhost:3000
+
+### Fazer o login
 # @name realizarLogin
-POST https://projeto-integrador-fiado.onrender.com/user/login HTTP/1.1
-Content-Type: application/json
+POST {{baseUrl}}/user/login HTTP/1.1
+content-type: application/json
 
 {
-    "email": "teste@gmail.com",
-    "senha": "1234"
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
 }
 
-### Salva o Token Globalmente para os produtos
-@userToken = {{realizarLogin.response.body.token}}
+### Salva o Token Globalmente
+@authToken = {{realizarLogin.response.body.token}}
 
+
+
+--------------------------------------------------------------------------
 
 ### criando os produtos
-POST https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
+POST {{baseUrl}}/product HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{userToken}}
+Authorization: Bearer {{authToken}}
 
 {
   "value": 20.00,
-  "name": "teste",
-  "type": "bike",
-  "description": "Descrição do produto 2",
+  "name": "batata frita",
+  "type": "comida",
+  "description": "batata frita",
   "url_img": "https://example.com/image2.jpg"
 }
 
 ### Listar todos os produtos
-GET https://projeto-integrador-fiado.onrender.com/product HTTP/1.1
+GET {{baseUrl}}/product HTTP/1.1
 Content-Type: application/json
 
 
-### Buscar produto por id
-GET https://projeto-integrador-fiado.onrender.com/product?type=bike HTTP/1.1
+### Buscar produto por TIPO
+GET {{baseUrl}}/product?type=comida HTTP/1.1
 Content-Type: application/json
 
-###editando todos os campos dos produtos
 
-PUT https://projeto-integrador-fiado.onrender.com/product/1 HTTP/1.1
+###editando produtos
+PUT {{baseUrl}}/product/15 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{userToken}}
+Authorization: Bearer {{authToken}}
 
-{
-  
+{  
   "value": 10.00,
   "name": "milena Produto 3",
   "type": "bola",
@@ -49,7 +58,7 @@ Authorization: Bearer {{userToken}}
   "url_img": "https://example.com/image2.jpg"
 }
 
-### deletando um usuario
-
-DELETE https://projeto-integrador-fiado.onrender.com/product/16 HTTP/1.1
+### deletando Produto
+DELETE {{baseUrl}}/product/3 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer {{authToken}}

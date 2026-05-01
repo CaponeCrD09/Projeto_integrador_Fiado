@@ -19,6 +19,15 @@ export async function createCompany(req, res, _next) {
     // Associa a empresa ao usuário logado, ignorando qualquer userId enviado no body
     data.userId = Number(req.logeded.id);
 
+    if (data.cnpj) {
+        const existingCompany = await prisma.company.findFirst({
+            where: { cnpj: data.cnpj, deletedAt: null }
+        });
+        if (existingCompany) {
+            return res.status(400).json({ erro: "Já existe uma empresa cadastrada com este CNPJ." });
+        }
+    }
+
     
     // Regra: Enviar imagem para o ImgBB se o usuário enviou o arquivo
     if (req.file) {
@@ -87,6 +96,15 @@ export async function updateCompany(req, res, _next) {
 
     if (!c) {
         return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA DE ID " + id + " (ou ela foi deletada)." })
+    }
+
+    if (cnpj) {
+        const existingCompany = await prisma.company.findFirst({
+            where: { cnpj: cnpj, id: { not: id }, deletedAt: null }
+        });
+        if (existingCompany) {
+            return res.status(400).json({ erro: "Já existe outra empresa cadastrada com este CNPJ." });
+        }
     }
 
     c = attachSave(c, "company");

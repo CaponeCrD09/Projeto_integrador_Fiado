@@ -247,9 +247,15 @@ export async function deletando(req, res, _next) {
             return res.status(403).json({ erro: "Acesso Negado: Você só tem permissão para deletar o próprio perfil." });
         }
 
-        const u = await prisma.user.findFirst({ where: { id: id } });
+        const u = await prisma.user.findFirst({ 
+            where: { id: id },
+            include: { companies: true }
+        });
 
         if (u) {
+            if (u.companies && u.companies.length > 0) {
+                return res.status(400).json({ erro: "nao pode apagar o usuario, pois existe uma company cadastrada no id , e que e necessario apagar a company antes" });
+            }
             await prisma.user.delete({ where: { id: id } });
             return res.status(200).json({ mensagem: "Usuário deletado com sucesso." });
         } else {

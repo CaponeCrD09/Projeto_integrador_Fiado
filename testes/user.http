@@ -1,21 +1,18 @@
 @emailLogin = admin@admin
 @senhaLogin = admin
+
 @baseUrl = https://projeto-integrador-fiado.onrender.com
+
+//@baseUrl = http://localhost:3000
 
 
 ### CRIAR PRIMEIRO ADMIN. (na primeira vez que for usar)
-POST https://projeto-integrador-fiado.onrender.com/user/admin HTTP/1.1
+POST {{baseUrl}}/user/admin HTTP/1.1
 content-type: application/json
-
-### CRIAR PRIMEIRO ADMIN. local
-POST http://localhost:3000/user/admin HTTP/1.1
-content-type: application/json
-
-### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
-# @name realizarLogin
 
 
 ### Fazer o login
+# @name realizarLogin
 POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
@@ -37,8 +34,8 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "testes",
-  "email":"teste@teste",
+  "name": "testes2",
+  "email":"teste33@teste",
   "senha":"teste",
   "type":"userOwner"
 }
@@ -85,6 +82,6 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE {{baseUrl}}/user/1 HTTP/1.1
+DELETE {{baseUrl}}/user/3 HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json
