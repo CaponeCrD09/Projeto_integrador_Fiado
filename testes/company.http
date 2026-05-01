@@ -63,7 +63,7 @@ Authorization: Bearer {{authToken}}
 
 
 # =============================================
-# ROTAS DE LEITURA (token opcional)
+# ROTAS DE LEITURA (token nao necessario)
 # =============================================
 
 ### Listar todas as companies
