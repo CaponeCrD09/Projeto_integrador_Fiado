@@ -1,33 +1,21 @@
 import { PrismaClient } from "@prisma/client";
-import { number, z } from 'zod';
+import { z } from 'zod';
 const prisma = new PrismaClient();
 import { attachSave } from "../utils/save.js";
-
-const ILLEGAL_WORDS = ['arma', 'droga', 'veneno', 'explosivo', 'ilícito', 'contrabando', 'narcótico', 'entorpecente', 'maconha', 'cocaína', 'crack'];
-
-function containsIllegalWords(text) {
-    if (!text || typeof text !== 'string') return false;
-    const lowerText = text.toLowerCase();
-    return ILLEGAL_WORDS.some(word => lowerText.includes(word));
-}
-
-function hasIllegalProductData(data) {
-    return containsIllegalWords(data.name) ||
-        containsIllegalWords(data.description) ||
-        containsIllegalWords(data.type);
-}
-
-
 
 //req: request, ou seja, a requisição que o frontend está fazendo para o backend, onde eu posso pegar os dados que estão sendo enviados pelo frontend, como por exemplo, os dados de um formulário ou os parâmetros de uma URL
 //res; response, ou seja, a resposta que o backend vai enviar para o frontend, onde eu posso enviar os dados que eu quero que o frontend receba, como por exemplo, os dados de um produto ou uma mensagem de erro
 //next; função para passar para o próximo middleware, caso haja algum erro ou algo do tipo, ele passa para o próximo middleware de tratamento de erros
 export async function createProducts(req, res, _next) {
     try {
-        const data = req.body
+        const data = req.body;
 
         if (!req.logeded) {
             return res.status(401).json({ error: "Usuário não autenticado." });
+        }
+
+        if (req.logeded.type !== "userOwner") {
+            return res.status(403).json({ error: "Apenas usuários do tipo userOwner podem criar produtos." });
         }
 
         const userCompany = await prisma.company.findFirst({
@@ -38,16 +26,11 @@ export async function createProducts(req, res, _next) {
             return res.status(403).json({ error: "Você precisa ter uma empresa vinculada para criar produtos." });
         }
 
-        // Associa o produto à empresa do usuário logado
         data.companyId = userCompany.id;
 
-        // Remove campos indesejados caso tenham sido enviados por engano (ex: copiado do user.http)
+        // Remove campos indesejados caso tenham sido enviados por engano
         delete data.email;
         delete data.senha;
-
-        if (hasIllegalProductData(data)) {
-            return res.status(400).json({ error: "Não é permitido cadastrar produtos ilícitos." });
-        }
 
         let p = await prisma.product.create({ data });
         return res.status(201).json(p);
@@ -79,8 +62,12 @@ export async function editProducts(req, res, _next) {
         let id = Number(req.params.id);
         const { value, name, type, description, url_img } = req.body;
 
-        if (hasIllegalProductData({ name, type, description })) {
-            return res.status(400).json({ error: "Não é permitido editar para produtos ilícitos." });
+        if (!req.logeded) {
+            return res.status(401).json({ error: "Usuário não autenticado." });
+        }
+
+        if (req.logeded.type !== "userOwner") {
+            return res.status(403).json({ error: "Apenas usuários do tipo userOwner podem editar produtos." });
         }
 
         let p = await prisma.product.findFirst({
@@ -92,9 +79,8 @@ export async function editProducts(req, res, _next) {
             return res.status(404).json({ error: "Não encontrei o produto" });
         }
 
-        let userId = req.logeded ? req.logeded.id : null;
-        if (!userId || p.companies.userId !== userId) {
-            return res.status(403).json({ error: "Apenas o dono do produto pode editá-lo." });
+        if (p.companies.userId !== req.logeded.id) {
+            return res.status(403).json({ error: "Acesso negado: Você só pode editar os seus próprios produtos." });
         }
 
         p = attachSave(p, 'product');
@@ -116,10 +102,13 @@ export async function editProducts(req, res, _next) {
 export async function deleteProducts(req, res, _next) {
     try {
         let id = Number(req.params.id);
-        let userId = req.logeded ? req.logeded.id : null;
 
-        if (!userId) {
+        if (!req.logeded) {
             return res.status(401).json({ error: "Usuário não autenticado." });
+        }
+
+        if (req.logeded.type !== "userOwner") {
+            return res.status(403).json({ error: "Apenas usuários do tipo userOwner podem deletar produtos." });
         }
 
         let d = await prisma.product.findFirst({
@@ -131,8 +120,8 @@ export async function deleteProducts(req, res, _next) {
             return res.status(404).json({ error: "Não encontrado" + id });
         }
 
-        if (d.companies.userId !== userId) {
-            return res.status(403).json({ error: "Apenas o dono do produto pode excluí-lo." });
+        if (d.companies.userId !== req.logeded.id) {
+            return res.status(403).json({ error: "Acesso negado: Você só pode deletar os seus próprios produtos." });
         }
 
         await prisma.product.delete({ where: { id: id } });

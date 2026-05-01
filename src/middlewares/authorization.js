@@ -65,18 +65,12 @@ export const requireOwnership = async (req, res, next) => {
 
     try {
       const company = await prisma.company.findFirst({
-        where: { userId: Number(userId), deletedAt: null },
+        where: { id: requestedId, userId: Number(userId), deletedAt: null },
       });
 
       if (!company) {
         return res.status(403).json({
-          erro: 'Acesso negado. Você não possui nenhuma empresa cadastrada.',
-        });
-      }
-
-      if (company.id !== requestedId) {
-        return res.status(403).json({
-          erro: 'Acesso negado. Você só pode modificar a sua própria empresa.',
+          erro: 'Acesso negado. Você não possui permissão para modificar esta empresa ou ela não existe.',
         });
       }
 

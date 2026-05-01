@@ -3,11 +3,16 @@
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
-//https://projeto-integrador-fiado.onrender.com
+//@baseUrl = http://localhost:3000
 
-### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
+
+### CRIAR PRIMEIRO ADMIN. (na primeira vez que for usar)
+POST {{baseUrl}}/user/admin HTTP/1.1
+content-type: application/json
+
+
+### Fazer o login
 # @name realizarLogin
-
 POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
@@ -19,7 +24,6 @@ content-type: application/json
 ### Salva o Token Globalmente
 @authToken = {{realizarLogin.response.body.token}}
 
-
 # =========================================================
 # CRIAR NOVO USUÁRIO (Requer Autenticação se for criar Admin)
 # =========================================================
@@ -30,10 +34,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "testes",
-  "email":"teste@gmail.com",
-  "senha":"1234",
-  "type":"userClient"
+  "name": "testes2",
+  "email":"teste33@teste",
+  "senha":"teste",
+  "type":"userOwner"
 }
 
 
@@ -78,6 +82,6 @@ content-type: application/json
 }
 
 ### deleta um usuario
-DELETE {{baseUrl}}/user/17 HTTP/1.1
+DELETE {{baseUrl}}/user/3 HTTP/1.1
 Authorization: Bearer {{authToken}}
 content-type: application/json

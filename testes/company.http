@@ -1,57 +1,49 @@
+@emailLogin = admin@admin
+@senhaLogin = admin
 
-# =============================================
-# VARIÁVEIS GLOBAIS — altere aqui suas credenciais
-# =============================================
-@baseUrl    = https://projeto-integrador-fiado.onrender.com
-@companyUrl = {{baseUrl}}/company
-@email      = teste@gmail.com
-@senha      = 1234
+@baseUrl = https://projeto-integrador-fiado.onrender.com
+
+//@baseUrl = http://localhost:3000
 
 
-# =============================================
-# PASSO 1: Login — execute esta requisição primeiro
-# O token será capturado automaticamente nas rotas abaixo
-# =============================================
-
-# @name login
+### Fazer o login
+# @name realizarLogin
 POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
 {
-  "email": "{{email}}",
-  "senha": "{{senha}}"
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
 }
 
-###
-
-@token = {{login.response.body.$.token}}
+### Salva o Token Globalmente
+@authToken = {{realizarLogin.response.body.token}}
 
 
 # =============================================
 # ROTAS PROTEGIDAS (precisam de token)
 # =============================================
 
-### Criar company (admin ou userOwner)
-POST {{companyUrl}} HTTP/1.1
+### Criar company (Apenas userOwner)
+POST {{baseUrl}}/company HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{authToken}}
 
 {
-  "name":     "para minha mae",
+  "name":     "teste3",
   "category": "balas",
-  "cnpj":     "1234520119",
+  "cnpj":     "124352192",
   "places":   "adacy",
   "zip_code": "1356899",
   "addrres":  "rua 2",
-  "phone":    "190",
-  "userId":   2
+  "phone":    "190"
 }
 
 
 ### Atualizar company (admin ou userOwner — só a própria)
-PUT {{companyUrl}}/1 HTTP/1.1
+PUT {{baseUrl}}/company/27 HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{authToken}}
 
 {
   "name":     "teste",
@@ -65,9 +57,9 @@ Authorization: Bearer {{token}}
 
 
 ### Deletar company (admin ou userOwner — só a própria)
-DELETE {{companyUrl}}/1 HTTP/1.1
+DELETE {{baseUrl}}/company/20 HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{authToken}}
 
 
 # =============================================
@@ -75,22 +67,18 @@ Authorization: Bearer {{token}}
 # =============================================
 
 ### Listar todas as companies
-GET {{companyUrl}} HTTP/1.1
+GET {{baseUrl}}/company HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{authToken}}
 
 
 ### Buscar uma company por ID
-GET {{companyUrl}}/2 HTTP/1.1
+GET {{baseUrl}}/company/26 HTTP/1.1
 content-type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{authToken}}
 
 
 ### Buscar por nome
-GET {{companyUrl}}?name=abrobrinha HTTP/1.1
+GET {{baseUrl}}/company?name=teste HTTP/1.1
 content-type: application/json
 
-
-### Buscar por tipo
-GET {{companyUrl}}?type=bo HTTP/1.1
-content-type: application/json

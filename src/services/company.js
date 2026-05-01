@@ -17,25 +17,18 @@ export async function createCompany(req, res, _next) {
     }
 
     // Associa a empresa ao usuário logado, ignorando qualquer userId enviado no body
-    data.userId = req.logeded.id;
+    data.userId = Number(req.logeded.id);
 
-    // Regra/Exceção: Não permitir cadastro de CNPJ duplicado
     if (data.cnpj) {
-        const cnpjExists = await prisma.company.findFirst({ where: { cnpj: data.cnpj } });
-        if (cnpjExists) {
-            return res.status(400).json({ erro: "Exceção: CNPJ já cadastrado no sistema. Não é possível ter empresas com o mesmo CNPJ." });
+        const existingCompany = await prisma.company.findFirst({
+            where: { cnpj: data.cnpj, deletedAt: null }
+        });
+        if (existingCompany) {
+            return res.status(400).json({ erro: "Já existe uma empresa cadastrada com este CNPJ." });
         }
     }
 
-    // Regra/Exceção: Não permitir a criação de empresa se contiver pagamentos acima de 10 mil
-    if (data.payments && data.payments.create) {
-        const pagamentos = Array.isArray(data.payments.create) ? data.payments.create : [data.payments.create];
-        const hasHighPayment = pagamentos.some(payment => payment.value > 10000);
-        if (hasHighPayment) {
-            return res.status(400).json({ erro: "Exceção: Não é permitido criar empresa com pagamentos acima de R$ 10.000,00." });
-        }
-    }
-
+    
     // Regra: Enviar imagem para o ImgBB se o usuário enviou o arquivo
     if (req.file) {
         try {
@@ -55,7 +48,7 @@ export async function createCompany(req, res, _next) {
 
 export async function readCompany(req, res, _next) {
     const { name, category, place, cnpj, zipCode, addrres, phone, userId } = req.query;
-    let consult = { deletedAt: null, id: Number(req.companyId) } // Filtra para mostrar apenas a própria empresa
+    let consult = { deletedAt: null } // Filtra para empresas não deletadas
 
     // Prisma "contains" auto aplica o "%" por trás, não precisamos passar na string manualmente
     if (name) consult.name = { contains: name };
@@ -83,11 +76,6 @@ export async function readCompany(req, res, _next) {
 export async function showCompany(req, res, _next) {
     let id = Number(req.params.id);
 
-    // Regra: Bloquear acesso não autorizado a registros de outra empresa
-    if (id !== Number(req.companyId)) {
-        return res.status(403).json({ erro: "Acesso negado: Você só pode acessar os registros da sua própria empresa." });
-    }
-
     let company = await prisma.company.findFirst({
         where: { id: id, deletedAt: null },
         include: { payments: true } // Opcional, retornando também os pagamentos
@@ -103,11 +91,6 @@ export async function showCompany(req, res, _next) {
 export async function updateCompany(req, res, _next) {
     let id = Number(req.params.id);
 
-    // Regra: Bloquear modificação de registros de outra empresa
-    if (id !== Number(req.companyId)) {
-        return res.status(403).json({ erro: "Acesso negado: Você só pode atualizar a sua própria empresa." });
-    }
-
     const { name, category, cnpj, places, zip_code, addrres, phone } = req.body;
     let c = await prisma.company.findFirst({ where: { id: id, deletedAt: null } });
 
@@ -115,11 +98,12 @@ export async function updateCompany(req, res, _next) {
         return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA DE ID " + id + " (ou ela foi deletada)." })
     }
 
-    // Regra/Exceção: Não permitir atualização para um CNPJ que já pertence a outra empresa
-    if (cnpj && cnpj !== c.cnpj) {
-        const cnpjExists = await prisma.company.findFirst({ where: { cnpj: cnpj } });
-        if (cnpjExists) {
-            return res.status(400).json({ erro: "Exceção: CNPJ já cadastrado no sistema para outra empresa." });
+    if (cnpj) {
+        const existingCompany = await prisma.company.findFirst({
+            where: { cnpj: cnpj, id: { not: id }, deletedAt: null }
+        });
+        if (existingCompany) {
+            return res.status(400).json({ erro: "Já existe outra empresa cadastrada com este CNPJ." });
         }
     }
 
@@ -153,11 +137,6 @@ export async function updateCompany(req, res, _next) {
 export async function deletCompany(req, res, _next) {
     let id = Number(req.params.id);
 
-    // Regra: Bloquear exclusão de outra empresa
-    if (id !== Number(req.companyId)) {
-        return res.status(403).json({ erro: "Acesso negado: Você só pode deletar a sua própria empresa." });
-    }
-
     if (isNaN(id)) {
         return res.status(400).json({ erro: "ID inválido fornecido." });
     }
@@ -169,12 +148,6 @@ export async function deletCompany(req, res, _next) {
 
     if (!c) {
         return res.status(404).json({ erro: "NÃO ENCONTREI A EMPRESA COM ID " + id });
-    }
-
-    // Regra/Exceção 1: Não ter empresa com pagamento acima de 10 mil
-    const hasHighPayment = c.payments && c.payments.some(payment => payment.value > 10000);
-    if (hasHighPayment) {
-        return res.status(400).json({ erro: "Exceção: Esta empresa possui pagamentos acima de R$ 10.000,00 e não pode ser deletada." });
     }
 
     try {

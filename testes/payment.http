@@ -3,11 +3,11 @@
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
-// https://projeto-integrador-fiado.onrender.com
+//@baseUrl = http://localhost:3000
 
-### Login (Servirá apenas para puxar o token automaticamente para as rotas abaixo)
+
+### Fazer o login
 # @name realizarLogin
-
 POST {{baseUrl}}/user/login HTTP/1.1
 content-type: application/json
 
@@ -30,7 +30,7 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-    "companyId":7,
+    "companyId":26,
     "value":20.0,      
     "method":"pix",  
     "toDate":"2026-04-01T00:00:01.000Z",       
@@ -85,7 +85,7 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-    "companyId":1,
+    "companyId":27,
     "value":10.0,      
     "method":"pix",  
     "toDate":"2026-04-18T00:00:01.000Z",       
