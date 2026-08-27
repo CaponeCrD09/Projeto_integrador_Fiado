@@ -1,0 +1,150 @@
+@emailLogin = teste@teste
+@senhaLogin = 123
+
+@baseUrl = https://projeto-integrador-fiado.onrender.com
+
+//@baseUrl = http://localhost:3000
+
+
+### Fazer o login
+# @name realizarLogin
+POST {{baseUrl}}/user/login HTTP/1.1
+content-type: application/json
+
+{
+  "email": "{{emailLogin}}",
+  "senha": "{{senhaLogin}}"
+}
+
+### Salva o Token Globalmente
+@authToken = {{realizarLogin.response.body.token}}
+
+
+# =========================================================
+# CRIAR PAGAMENTO
+# =========================================================
+
+### Criar pagamento
+POST {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+    "companyId":33,
+    "value":20.0,      
+    "method":"pix",  
+    "toDate":"2026-04-01T00:00:01.000Z",       
+    "dueDate":"2026-04-25T00:00:00.000Z"
+}
+
+
+# =========================================================
+# ROTAS PROTEGIDAS (Listar, Ver, Editar, Deletar)
+# =========================================================
+
+### Listar todos os pagamentos
+GET {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+### Mostrar pagamento por ID
+GET {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+### Editar pagamento
+PUT {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+    "companyId":7,
+    "value":20.0,      
+    "method":"boleto",  
+    "toDate":"2026-04-01T00:00:00.000Z",       
+    "dueDate":"2026-04-25T00:00:00.000Z"
+}
+
+### Deletar pagamento
+DELETE {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+
+###############################################
+### TESTES DE TOKEN DE OUTRO USUARIO (DEVEM FALHAR COM 403)
+### Mensagem esperada: "Acesso Negado: Este token é invalido ou pertence a outro usuário."
+###############################################
+
+### ERRO: Criar pagamento com userId diferente do token
+### O token é do usuario 1 (sub:1), mas userId no body é 2
+### Deve retornar 403: "Acesso Negado: Este token é invalido ou pertence a outro usuário."
+
+POST {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+    "companyId":27,
+    "value":10.0,      
+    "method":"pix",  
+    "toDate":"2026-04-18T00:00:01.000Z",       
+    "dueDate":"2026-04-19T00:00:00.000Z",        
+    "userId":99
+}
+
+### ERRO: Ver pagamento que pertence a outro usuario
+### Deve retornar 403 se o pagamento não pertence ao usuario do token
+
+GET {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+### ERRO: Editar pagamento que pertence a outro usuario
+### Deve retornar 403 se o pagamento não pertence ao usuario do token
+
+PUT {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+    "value": 50.0
+}
+
+### ERRO: Deletar pagamento que pertence a outro usuario
+### Deve retornar 403 se o pagamento não pertence ao usuario do token
+
+DELETE {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+###############################################
+### TESTES DE EMPRESA DE OUTRO USUARIO (DEVEM FALHAR COM 403)
+### Mensagem esperada: "Acesso Negado: Esta empresa não pertence ao seu usuário."
+###############################################
+
+### ERRO: Criar pagamento usando empresa de outro usuario
+### Se a empresa com companyId não pertence ao usuario do token, retorna 403
+
+POST {{baseUrl}}/payment HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+    "companyId":999,
+    "value":10.0,      
+    "method":"pix",  
+    "toDate":"2026-04-18T00:00:01.000Z",       
+    "dueDate":"2026-04-19T00:00:00.000Z"
+}
+
+### ERRO: Editar pagamento trocando para empresa de outro usuario
+### Deve retornar 403 se a nova companyId não pertence ao usuario do token
+
+PUT {{baseUrl}}/payment/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+content-type: application/json
+
+{
+    "companyId": 999
+}
