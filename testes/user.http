@@ -1,6 +1,6 @@
 //atualizar login
-@emailLogin = admin@admin
-@senhaLogin = admin
+@emailLogin = teste@teste
+@senhaLogin = 123
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 

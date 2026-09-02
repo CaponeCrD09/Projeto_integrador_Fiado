@@ -1,9 +1,9 @@
 @emailLogin = admin@admin
 @senhaLogin = admin
 
-@baseUrl = https://projeto-integrador-fiado.onrender.com
+//@baseUrl = https://projeto-integrador-fiado.onrender.com
 
-//@baseUrl = http://localhost:3000
+@baseUrl = http://localhost:3000
 
 
 ### Fazer o login
