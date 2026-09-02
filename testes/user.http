@@ -1,6 +1,6 @@
 //atualizar login
-@emailLogin = teste@teste
-@senhaLogin = 123
+@emailLogin = admin@admin
+@senhaLogin = admin
 
 @baseUrl = https://projeto-integrador-fiado.onrender.com
 
@@ -35,10 +35,10 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "testes",
-  "email":"teste@teste",
-  "senha":"123",
-  "type":"userOwner"
+  "name": "neres",
+  "email":"neres@neres110",  
+  "senha":"neres",
+  "type":"admin"
 }
 
 
