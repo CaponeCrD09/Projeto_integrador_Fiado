@@ -36,9 +36,9 @@ content-type: application/json
 
 {
   "name": "neres",
-  "email":"neres@neres",  
+  "email":"neres@neres1",  
   "senha":"neres",
-  "type":"admin"
+  "type":"userOwner"
 }
 
 
