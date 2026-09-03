@@ -1,3 +1,4 @@
+//atualizar login
 @emailLogin = admin@admin
 @senhaLogin = admin
 
@@ -34,9 +35,9 @@ Authorization: Bearer {{authToken}}
 content-type: application/json
 
 {
-  "name": "testes",
-  "email":"teste@teste",
-  "senha":"123",
+  "name": "neres",
+  "email":"neres@neres1",  
+  "senha":"neres",
   "type":"userOwner"
 }
 
